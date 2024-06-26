@@ -1,13 +1,15 @@
 'use client'
 
 // MUI Imports
+import { useParams } from 'next/navigation'
+
 import { useTheme } from '@mui/material/styles'
 
 // Third-party Imports
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
 // Component Imports
-import { Menu, MenuItem } from '@menu/vertical-menu'
+import { Menu, SubMenu, MenuItem, MenuSection } from '@menu/vertical-menu'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -26,7 +28,7 @@ const RenderExpandIcon = ({ open, transitionDuration }) => (
   </StyledVerticalNavExpandIcon>
 )
 
-const VerticalMenu = ({ scrollMenu }) => {
+const VerticalMenu = ({ scrollMenu, dictionary }) => {
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
@@ -60,12 +62,83 @@ const VerticalMenu = ({ scrollMenu }) => {
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <MenuItem href='/home' icon={<i className='tabler-smart-home' />}>
-          Home
+        <MenuItem href='/dashboard' icon={<i className='tabler-layout-dashboard' />}>
+          Dashboard
         </MenuItem>
-        <MenuItem href='/about' icon={<i className='tabler-info-circle' />}>
-          About
-        </MenuItem>
+
+        {/* menu section */}
+        <MenuSection>
+          <SubMenu label={'User'} icon={<i className='tabler-user' />}>
+            <MenuItem href={`/user/list`}>User list</MenuItem>
+            <MenuItem href={`/user/view`}>Preview</MenuItem>
+          </SubMenu>
+        </MenuSection>
+        {/* equipment menu */}
+        <MenuSection>
+          <SubMenu label={'Equipment'} icon={<i className='tabler-barbell' />}>
+            <MenuItem href={`/equipment/list`}>Equipment List</MenuItem>
+            <MenuItem href={`/equipment/add`}>Add Equipment</MenuItem>
+          </SubMenu>
+        </MenuSection>
+        {/* Exercise menu */}
+        <MenuSection>
+          <SubMenu label={'Exercise'} icon={<i className='tabler-woman' />}>
+            <MenuItem href={`/exercise/list`}>Exercise List</MenuItem>
+            <MenuItem href={`/exercise/add`}>Add Exercise</MenuItem>
+          </SubMenu>
+        </MenuSection>
+
+        {/* Workout menu */}
+        <MenuSection>
+          <SubMenu label={'Workout'} icon={<i className='tabler-stretching' />}>
+            <MenuItem href={`/workout/list`}>Workout List</MenuItem>
+            <MenuItem href={`/workout/add`}>Add Workout</MenuItem>
+            <MenuItem href={`/workout/typelist`}>Workout Type List</MenuItem>
+          </SubMenu>
+        </MenuSection>
+        {/* Diet menu */}
+        <MenuSection>
+          <SubMenu label={'Diet'} icon={<i className='tabler-grill-off' />}>
+            <MenuItem href={`/diet/list`}>Diet List</MenuItem>
+            <MenuItem href={`/diet/add`}>Add Diet</MenuItem>
+            <MenuItem href={`/diet/categorylist`}>Category Diet List</MenuItem>
+          </SubMenu>
+        </MenuSection>
+        {/* Body Part menu */}
+        <MenuSection>
+          <SubMenu label={'Body Part'} icon={<i className='tabler-play-handball' />}>
+            <MenuItem href={`/bodyPart/list`}>Body Part List</MenuItem>
+            <MenuItem href={`/bodyPart/add`}>Add Body Part</MenuItem>
+          </SubMenu>
+        </MenuSection>
+        {/* Product menu */}
+        <MenuSection>
+          <SubMenu label={'Product'} icon={<i className='tabler-shopping-cart' />}>
+            <MenuItem href={`/product/list`}>Product List</MenuItem>
+            <MenuItem href={`/product/add`}>Add Product</MenuItem>
+            <MenuItem href={`/product/categorylist`}>Product Category List</MenuItem>
+          </SubMenu>
+        </MenuSection>
+        {/* Influencer menu */}
+        <MenuSection>
+          <SubMenu label={'Influencer'} icon={<i className='tabler-users' />}>
+            <MenuItem href={`/influencer/list`}>Influencer List</MenuItem>
+            <MenuItem href={`/influencer/add`}>add new influencer</MenuItem>
+          </SubMenu>
+        </MenuSection>
+        {/* Subscription menu */}
+        <MenuSection>
+          <SubMenu label={'Subscription'} icon={<i className='tabler-crown' />}>
+            <MenuItem href={`/subscription/list`}>Subscription List</MenuItem>
+          </SubMenu>
+        </MenuSection>
+        {/* Account Setting menu */}
+        <MenuSection>
+          <SubMenu label={'Account Setting'} icon={<i className='tabler-user-cog' />}>
+            <MenuItem href={`/accountSetting/list`}>Role List</MenuItem>
+            <MenuItem href={`/accountSetting/list`}>Permission List</MenuItem>
+          </SubMenu>
+        </MenuSection>
       </Menu>
       {/* <Menu
           popoutMenuOffset={{ mainAxis: 23 }}
