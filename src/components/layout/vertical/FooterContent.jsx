@@ -20,7 +20,6 @@ const FooterContent = () => {
       <p>
         <span className='text-textSecondary'>Created</span>
         <span className='text-textSecondary'>{` by `}</span>
-        <span>{`❤️`}</span>
         <span> Fike Fit</span>
       </p>
     </div>

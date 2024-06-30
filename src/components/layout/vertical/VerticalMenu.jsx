@@ -111,12 +111,14 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
             <MenuItem href={`/bodyPart/add`}>Add Body Part</MenuItem>
           </SubMenu>
         </MenuSection>
-        {/* Product menu */}
+        {/* Store menu */}
+        {/* product folder is Store */}
         <MenuSection>
-          <SubMenu label={'Product'} icon={<i className='tabler-shopping-cart' />}>
-            <MenuItem href={`/product/list`}>Product List</MenuItem>
-            <MenuItem href={`/product/add`}>Add Product</MenuItem>
-            <MenuItem href={`/product/categorylist`}>Product Category List</MenuItem>
+          <SubMenu label={'Stores'} icon={<i className='tabler-shopping-cart' />}>
+            <MenuItem href={`/stores/list`}>Store List</MenuItem>
+            <MenuItem href={`/stores/add`}>Add new Store</MenuItem>
+            <MenuItem href={`/stores/categorylist`}>Store Category List</MenuItem>
+            <MenuItem href={`/stores/addCategory`}>Add Store Category</MenuItem>
           </SubMenu>
         </MenuSection>
         {/* Influencer menu */}
@@ -140,15 +142,6 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
           </SubMenu>
         </MenuSection>
       </Menu>
-      {/* <Menu
-          popoutMenuOffset={{ mainAxis: 23 }}
-          menuItemStyles={menuItemStyles(verticalNavOptions, theme, settings)}
-          renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
-          renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
-          menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
-        >
-          <GenerateVerticalMenu menuData={menuData(dictionary, params)} />
-        </Menu> */}
     </ScrollWrapper>
   )
 }
