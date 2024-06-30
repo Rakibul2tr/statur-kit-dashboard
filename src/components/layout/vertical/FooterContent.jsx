@@ -15,47 +15,14 @@ import { useSettings } from '@core/hooks/useSettings'
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 
 const FooterContent = () => {
-  // Hooks
-  const { settings } = useSettings()
-  const { isBreakpointReached: isVerticalBreakpointReached } = useVerticalNav()
-  const { isBreakpointReached: isHorizontalBreakpointReached } = useHorizontalNav()
-
-  // Vars
-  const isBreakpointReached =
-    settings.layout === 'vertical' ? isVerticalBreakpointReached : isHorizontalBreakpointReached
-
   return (
-    <div
-      className={classnames(verticalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}
-    >
+    <div className={classnames(verticalLayoutClasses.footerContent, 'text-right')}>
       <p>
-        <span className='text-textSecondary'>{`© ${new Date().getFullYear()}, Made with `}</span>
-        <span>{`❤️`}</span>
+        <span className='text-textSecondary'>Created</span>
         <span className='text-textSecondary'>{` by `}</span>
-        <Link href='https://pixinvent.com' target='_blank' className='text-primary uppercase'>
-          Pixinvent
-        </Link>
+        <span>{`❤️`}</span>
+        <span> Fike Fit</span>
       </p>
-      {!isBreakpointReached && (
-        <div className='flex items-center gap-4'>
-          <Link href='https://themeforest.net/licenses/standard' target='_blank' className='text-primary'>
-            License
-          </Link>
-          <Link href='https://themeforest.net/user/pixinvent/portfolio' target='_blank' className='text-primary'>
-            More Themes
-          </Link>
-          <Link
-            href='https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation'
-            target='_blank'
-            className='text-primary'
-          >
-            Documentation
-          </Link>
-          <Link href='https://pixinvent.ticksy.com' target='_blank' className='text-primary'>
-            Support
-          </Link>
-        </div>
-      )}
     </div>
   )
 }
