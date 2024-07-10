@@ -11,7 +11,7 @@ export default function UserdataTable({ data, theadData }) {
                 <tr>
                   {Object.keys(theadData[0]).map(val => (
                     <th
-                      key={val.id}
+                      key={val}
                       scope='col'
                       className='bg-slate-800 px-6 py-3 text-xs font-bold text-left text-gray-600 uppercase '
                     >

@@ -6,6 +6,7 @@ import '@/app/globals.css'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
+import Providers from '../lib/Provider'
 
 export const metadata = {
   title: 'fike fit'
@@ -16,9 +17,11 @@ const RootLayout = ({ children }) => {
   const direction = 'ltr'
 
   return (
-    <html id='__next' lang='en' dir={direction}>
-      <body className='flex is-full min-bs-full flex-auto flex-col'>{children}</body>
-    </html>
+    <Providers>
+      <html id='__next' lang='en' dir={direction}>
+        <body className='flex is-full min-bs-full flex-auto flex-col'>{children}</body>
+      </html>
+    </Providers>
   )
 }
 

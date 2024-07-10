@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // Next Imports
 import { useRouter } from 'next/navigation'
@@ -31,6 +31,7 @@ import themeConfig from '@configs/themeConfig'
 // Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
+import { useLoginUserMutation } from '@/redux/api/apiSlice'
 
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -59,14 +60,13 @@ const MaskImg = styled('img')({
 const LoginV2 = ({ mode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   // Vars
   const darkImg = '/images/pages/auth-mask-dark.png'
   const lightImg = '/images/pages/auth-mask-light.png'
-  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
-  const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
-  const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
-  const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
+  const lightIllustration = '/images/illustrations/auth/carton.jpg'
 
   // Hooks
   const router = useRouter()
@@ -75,34 +75,57 @@ const LoginV2 = ({ mode }) => {
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const authBackground = useImageVariant(mode, lightImg, darkImg)
 
-  const characterIllustration = useImageVariant(
-    mode,
-    lightIllustration,
-    darkIllustration,
-    borderedLightIllustration,
-    borderedDarkIllustration
-  )
+  const characterIllustration = useImageVariant(mode, lightIllustration)
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
+
+  // redux data fetching
+  const [loginUser, { data, isLoading, isSuccess, isError }] = useLoginUserMutation()
+
+  // login hendel
+  const onsubmitHendel = e => {
+    e.preventDefault()
+
+    if (email == '') {
+      alert('please check your email')
+    } else if (password == '') {
+      alert('please check your password')
+    }
+
+    loginUser({
+      email: email,
+      password: password
+    })
+  }
+
+  useEffect(() => {
+    if (isSuccess) {
+      localStorage.setItem('user', JSON.stringify(data))
+      router.push('/dashboard')
+    } else if (isError) {
+      console.log('error check')
+    }
+  }, [isSuccess, router, isError, data])
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center'>
+        <h1>Loading...</h1>
+      </div>
+    )
+  }
 
   return (
     <div className='flex bs-full justify-center'>
       <div
         className={classnames(
-          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
+          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden bg-backgroundPaper',
           {
             'border-ie': settings.skin === 'bordered'
           }
         )}
       >
-        <LoginIllustration src={characterIllustration} alt='character-illustration' />
-        {!hidden && (
-          <MaskImg
-            alt='mask'
-            src={authBackground}
-            className={classnames({ 'scale-x-[-1]': theme.direction === 'rtl' })}
-          />
-        )}
+        <LoginIllustration src={lightIllustration} alt='character-illustration' />
       </div>
       <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px]'>
         <div className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
@@ -113,22 +136,21 @@ const LoginV2 = ({ mode }) => {
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
             <Typography>Please sign-in to your account and start the adventure</Typography>
           </div>
-          <form
-            noValidate
-            autoComplete='off'
-            onSubmit={e => {
-              e.preventDefault()
-              router.push('/')
-            }}
-            className='flex flex-col gap-5'
-          >
-            <CustomTextField autoFocus fullWidth label='Email or Username' placeholder='Enter your email or username' />
+          <form noValidate autoComplete='off' onSubmit={onsubmitHendel} className='flex flex-col gap-5'>
+            <CustomTextField
+              autoFocus
+              fullWidth
+              setValue={e => setEmail(e.target.value)}
+              label='Email or Username'
+              placeholder='Enter your email or username'
+            />
             <CustomTextField
               fullWidth
               label='Password'
               placeholder='············'
               id='outlined-adornment-password'
               type={isPasswordShown ? 'text' : 'password'}
+              setValue={e => setPassword(e.target.value)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position='end'>
@@ -153,21 +175,6 @@ const LoginV2 = ({ mode }) => {
               <Typography component={Link} color='primary'>
                 Create an account
               </Typography>
-            </div>
-            <Divider className='gap-2 text-textPrimary'>or</Divider>
-            <div className='flex justify-center items-center gap-1.5'>
-              <IconButton className='text-facebook' size='small'>
-                <i className='tabler-brand-facebook-filled' />
-              </IconButton>
-              <IconButton className='text-twitter' size='small'>
-                <i className='tabler-brand-twitter-filled' />
-              </IconButton>
-              <IconButton className='text-textPrimary' size='small'>
-                <i className='tabler-brand-github-filled' />
-              </IconButton>
-              <IconButton className='text-error' size='small'>
-                <i className='tabler-brand-google-filled' />
-              </IconButton>
             </div>
           </form>
         </div>

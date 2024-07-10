@@ -1,6 +1,11 @@
-import React from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
+
+import axios from 'axios'
 
 import UserdataTable from '../../../components/UserdataTable'
+
+import { baseUrl } from '../../../../utils/beseUrl'
 
 const sampleData = [
   {
@@ -100,6 +105,17 @@ const theadData = [
 ]
 
 export default function Page() {
+  const [userData, setuserData] = useState([])
+
+  useEffect(() => {
+    axios.get(`${baseUrl}/api/users/`).then(response => {
+      // setuserData(response.data)
+      console.log(response.data)
+    })
+  }, [])
+
+  // console.log('user', userData)
+
   return (
     <div className=' p-2'>
       {/* main title  */}
@@ -130,7 +146,7 @@ export default function Page() {
         </div>
       </div>
       <div className='overflow-hidden'>
-        <UserdataTable data={sampleData} theadData={theadData} />
+        <UserdataTabnple data={sampleData} theadData={theadData} />
       </div>
     </div>
   )
