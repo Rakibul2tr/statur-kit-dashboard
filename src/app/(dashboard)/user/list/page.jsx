@@ -146,7 +146,7 @@ export default function Page() {
         </div>
       </div>
       <div className='overflow-hidden'>
-        <UserdataTabnple data={sampleData} theadData={theadData} />
+        <UserdataTable data={sampleData} theadData={theadData} />
       </div>
     </div>
   )

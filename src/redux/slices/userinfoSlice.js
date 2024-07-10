@@ -12,6 +12,7 @@ const initialState = {
   activity: "",
   goal: "",
 };
+
 export const userInfoSlice = createSlice({
   name: "form",
   initialState,
