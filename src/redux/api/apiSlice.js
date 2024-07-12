@@ -99,31 +99,39 @@ export const apiSlice = createApi({
     //     },
     //   }),
     // }),
-    //****************** program screens api start ******************* */
-    //============== program data Get api===============
-    programDataGet: builder.query({
-      query: data => ({
-        url: '/api/programs/',
+    //============== users data Get api===============
+    alllUsersDataGet: builder.query({
+      query: ({ token }) => ({
+        url: '/api/users/',
         method: 'GET',
         headers: {
-          authorization: `token ${data?.token}`
+          authorization: `token ${token}`
         }
       })
     }),
 
-    //============== program details Get api===============
-
-    programDetails: builder.query({
-      query: data => ({
-        url: `/api/programs/${data.id}`,
+    //============== personal user  Get me api===============
+    personalUserGet: builder.query({
+      query: ({ token }) => ({
+        url: '/api/users/me',
         method: 'GET',
         headers: {
-          authorization: `token ${data?.token}`
+          authorization: `token ${token}`
         }
       })
     }),
 
-    //********************** program screens api end ******************* */
+    //============== user update api===============
+    updateUser: builder.mutation({
+      query: ({ token, formData, id }) => ({
+        url: `/api/users/${id}`,
+        method: 'PATCH',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: formData
+      })
+    }),
 
     //*********************** store screens api start **************** */
     //===============product add  api==============
@@ -139,16 +147,42 @@ export const apiSlice = createApi({
       })
     }),
 
+    //============== all product Get api===============
+
+    allProduct: builder.query({
+      query: ({ token }) => ({
+        url: `/api/products/`,
+        method: 'GET',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
     //===============Product single update api==============
 
     updateProduct: builder.mutation({
-      query: ({ token, formData }) => ({
-        url: `/api/product-categories/`,
+      query: ({ token, formData, id }) => ({
+        url: `/api/products/${id}`,
         method: 'PATCH',
+        headers: {
+          authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+    }),
+
+    //===============Product category get api==============Done
+
+    productCategory: builder.query({
+      query: ({ token, categoryData }) => ({
+        url: `/api/product-categories/`,
+        method: 'GET',
         headers: {
           authorization: `token ${token}`
         },
-        body: formData
+        body: categoryData
       })
     }),
 
@@ -173,62 +207,12 @@ export const apiSlice = createApi({
         method: 'PATCH',
         headers: {
           authorization: `token ${token}`
+
+          // 'Content-Type': 'application/json'
         },
         body: formData
       })
     })
-
-    // body: {
-    // category: data.formData.category,
-    // description: data.formData.description,
-    // features: data.formData.features,
-    // photo_url: data.formData.photo_url,
-    // price: data.formData.price,
-    // stock: data.formData.stock,
-    // title: data.formData.title,
-    // tex_percentage: data.formData.tex_percentage
-    // }
-
-    //===============user information update api==============
-
-    // userInfoUpdate: builder.mutation({
-    //   query: (data) => ({
-    //     url: "/update-user-profile",
-    //     method: "POST",
-    //     headers: {
-    //       authorization: `Bearer ${data.userInfo._token}`,
-    //     },
-    //     body: {
-    //       email: data.userInfo.user_email,
-    //       user_category_id: data.user_category_id,
-    //     },
-    //   }),
-    // }),
-
-    //============== first Screen Post data Get api===============
-    // getFirstScreenPost: builder.query({
-    //   query: (data) => ({
-    //     url: "/posts",
-    //     method: "GET",
-    //     headers: {
-    //       authorization: `Bearer ${data._token}`,
-    //     },
-    //   }),
-    // }),
-    //============== second Screen Post data Get api===============
-    // getSecondScreenPost: builder.query({
-    //   query: (data) => ({
-    //     url: "/secondaryposts",
-    //     method: "GET",
-    //     headers: {
-    //       authorization: `Bearer ${data._token}`,
-    //     },
-    //   }),
-    // }),
-
-    // getItem: builder.query({
-    //     query: (id) => `/gatting/${id}`,
-    // }),
   })
 })
 
@@ -244,14 +228,21 @@ export const {
 
   // authentication end======
 
+  // users start
+  useAlllUsersDataGetQuery,
+  useUpdateUserMutation,
+  usePersonalUserGetQuery,
+
   // program screens start======
   useProgramDataGetQuery,
 
   // product start
   useCreateProductMutation,
   useUpdateProductMutation,
+  useAllProductQuery,
 
   // product category
   useCreateProductCategoryMutation,
-  useUpdateProductCategoryMutation
+  useUpdateProductCategoryMutation,
+  useProductCategoryQuery
 } = apiSlice

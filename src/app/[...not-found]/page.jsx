@@ -9,16 +9,24 @@ import { getServerMode, getSystemMode } from '@core/utils/serverHelpers'
 const NotFoundPage = () => {
   // Vars
   const direction = 'ltr'
-  const mode = getServerMode()
+
+  // const mode = getServerMode()
+
   const systemMode = getSystemMode()
 
   return (
     <Providers direction={direction}>
       <BlankLayout systemMode={systemMode}>
-        <NotFound mode={mode} />
+        <NotFound />
       </BlankLayout>
     </Providers>
   )
+}
+
+export async function generateStaticParams() {
+  // Provide a list of paths that you want to statically generate
+  // In this case, we can generate a fallback for any path
+  return [{ params: { slug: [] } }]
 }
 
 export default NotFoundPage

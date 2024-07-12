@@ -8,16 +8,16 @@ export default function Page() {
   const [createProductCategory, { isLoading, isSuccess, isError, error }] = useCreateProductCategoryMutation()
 
   const [formData, setFormData] = useState({
-    id: 3,
+    id: 0,
     title: 'test cat 3',
     description: 'details',
-    photo_url: 'https://i.ibb.co/R6Mgx17/product-1.jpg',
+    photo_url: '',
     is_active: true
   })
 
   useEffect(() => {
     const localData = async () => {
-      const data = await localStorage.getItem('user')
+      const data = localStorage.getItem('user')
       const userData = JSON.parse(data)
 
       if (userData) {
@@ -45,7 +45,7 @@ export default function Page() {
     })
   }
 
-  console.log('user', userData)
+  // console.log('user', userData)
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -57,63 +57,57 @@ export default function Page() {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className='max-w-2xl mx-auto p-4 bg-white shadow-md rounded-lg'>
+      {/* main title  */}
+      <div className='  py-8 px-3 '>
+        <h1 className='text-slate-300 text-2xl text-center'>Create Product Category </h1>
+      </div>
+      <form onSubmit={handleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-950 shadow-md rounded-lg'>
         <div className='mb-4'>
-          <label className='block text-gray-700 font-bold mb-2'>ID:</label>
+          <label className='block text-white font-bold mb-2'>ID:</label>
           <input
             type='number'
             name='id'
             value={formData.id}
             onChange={handleChange}
-            className='w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-blue-500'
+            className='w-full px-3 py-2 text-white bg-slate-800 border rounded-lg shadow-sm focus:outline-none focus:border-blue-500'
           />
         </div>
         <div className='mb-4'>
-          <label className='block text-gray-700 font-bold mb-2'>Title:</label>
+          <label className='block text-white font-bold mb-2'>Title:</label>
           <input
             type='text'
             name='title'
             value={formData.title}
             onChange={handleChange}
-            className='w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-blue-500'
+            className='w-full px-3 py-2 text-white border bg-slate-800 rounded-lg shadow-sm focus:outline-none focus:border-blue-500'
           />
         </div>
         <div className='mb-4'>
-          <label className='block text-gray-700 font-bold mb-2'>Description:</label>
+          <label className='block text-white font-bold mb-2'>Description:</label>
           <textarea
             name='description'
             value={formData.description}
             onChange={handleChange}
-            className='w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-blue-500'
+            className='w-full px-3 py-2 text-white border bg-slate-800 rounded-lg shadow-sm focus:outline-none focus:border-blue-500'
           />
         </div>
         <div className='mb-4'>
-          <label className='block text-gray-700 font-bold mb-2'>Photo URL:</label>
+          <label className='block text-white font-bold mb-2'>Photo URL:</label>
           <input
             type='text'
             name='photo_url'
             value={formData.photo_url}
             onChange={handleChange}
-            className='w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-blue-500'
-          />
-        </div>
-        <div className='mb-4'>
-          <label className='block text-gray-700 font-bold mb-2'>Is Active:</label>
-          <input
-            type='checkbox'
-            name='is_active'
-            checked={formData.is_active}
-            onChange={handleChange}
-            className='h-5 w-5 text-blue-500 focus:ring-blue-500 border-gray-300 rounded'
+            className='w-full px-3 py-2 text-white border bg-slate-800 rounded-lg shadow-sm focus:outline-none focus:border-blue-500'
           />
         </div>
         <button
           type='submit'
-          className='w-full px-4 py-2 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-700 focus:outline-none'
+          className='w-full px-4 py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-[#ffff44] focus:outline-none cursor-pointer'
 
           // disabled={isLoading}
         >
-          Submit
+          Create Category
         </button>
       </form>
     </div>

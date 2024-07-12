@@ -25,8 +25,14 @@ export default function UserdataTable({ data, theadData }) {
                   return (
                     <tr key={item.id}>
                       <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
-                      <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.name}</td>
-                      {item.level && (
+                      {item?.title && (
+                        <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
+                      )}
+                      {item?.category?.id && (
+                        <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item?.category?.id}</td>
+                      )}
+
+                      {item?.title && (
                         <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.level}</td>
                       )}
                       {item.workout && (

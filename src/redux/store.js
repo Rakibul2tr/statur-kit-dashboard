@@ -6,10 +6,12 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit'
 
 import { apiSlice } from './api/apiSlice'
 
+import { programsApislice } from './api/programsApislice'
+
 const rootReducer = combineReducers({
-  // form: userInfoReducer,
-  // favorites: favoritesProgramSlice,
-  [apiSlice.reducerPath]: apiSlice.reducer
+  [apiSlice.reducerPath]: apiSlice.reducer,
+
+  [programsApislice.reducerPath]: programsApislice.reducer
 })
 
 export const store = configureStore({

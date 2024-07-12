@@ -1,31 +1,47 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
-const UserInfoUpdate = () => {
+import { usePersonalUserGetQuery, useUpdateUserMutation } from '@/redux/api/apiSlice'
+
+const UserInfoUpdate = ({ userData }) => {
+  const [updateUser, { error }] = useUpdateUserMutation()
+  const { data: user } = usePersonalUserGetQuery({ token: userData.token })
+
   const [formData, setFormData] = useState({
-    firstname: '',
-    lastname: '',
-    username: '',
+    name: '',
     email: '',
     phone: '',
-    password: '',
     gender: '',
     age: '',
-    profileImage: null,
+    photo: '',
     status: 'active',
     role: 'user'
   })
 
+  // console.log('user', user)
+  useEffect(() => {
+    // setFormData({
+    //   name: user?.name,
+    //   email: user?.email,
+    //   phone: user?.phone,
+    //   gender: user?.gender,
+    //   age: user?.age,
+    //   photo: user?.photo,
+    //   status: user?.status,
+    //   role: user?.role
+    // })
+  }, [])
+
   const handleChange = e => {
     const { name, value, files } = e.target
 
-    if (name === 'profileImage') {
+    if (name === 'photo') {
       setFormData({
         ...formData,
-        profileImage: files[0]
+        photo: files[0]
       })
     } else {
       setFormData({
@@ -38,14 +54,16 @@ const UserInfoUpdate = () => {
   const handleSubmit = e => {
     e.preventDefault()
 
-    // Handle form submission (e.g., API call to update user info)
+    // updateUser({
+    //   token: userData.token
+    // })
 
     console.log('Form submitted', formData)
   }
 
   return (
     <div className='flex flex-row w-full'>
-      <div className='userImage w-3/12 bg-white rounded-lg'>
+      <div className='userImage w-3/12 bg-slate-950 rounded-lg'>
         <h2 className='text-2xl py-3 font-bold mb-6 text-slate-600 text-center'>Add User</h2>
         <div className='flex flex-col items-center justify-center'>
           <label
@@ -53,7 +71,13 @@ const UserInfoUpdate = () => {
             className='flex flex-col items-center justify-center text-sm font-medium text-gray-700'
           >
             <div className='flex bg-slate-800 w-24 h-24 rounded-xl items-center justify-center'>
-              <Image src={''} alt='profile image' width={80} height={80} className='rounded-xl' />
+              <Image
+                src={'https://cdn.iconscout.com/icon/free/png-256/free-avatar-372-456324.png'}
+                alt='profile image'
+                width={80}
+                height={80}
+                className='rounded-xl'
+              />
             </div>
             <div className='relative text-center bottom-4 left-5 bg-slate-500 w-8 h-8 rounded-full'>
               <i className='tabler-pencil-plus text-red-600 ' />
@@ -62,8 +86,8 @@ const UserInfoUpdate = () => {
 
           <input
             type='file'
-            name='profileImage'
-            id='profileImage'
+            name='photo'
+            id='photo'
             accept='image/*'
             onChange={handleChange}
             placeholder=''
@@ -80,7 +104,7 @@ const UserInfoUpdate = () => {
             id='status'
             value={formData.status}
             onChange={handleChange}
-            className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
+            className='mt-1 block w-full px-3 py-2 border bg-slate-800 text-white border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
           >
             <option value='active'>Active</option>
             <option value='Inactive'>Inactive</option>
@@ -98,7 +122,7 @@ const UserInfoUpdate = () => {
             id='role'
             value={formData.role}
             onChange={handleChange}
-            className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
+            className='mt-1 block w-full px-3 py-2 border bg-slate-800 text-white border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
           >
             <option value='User'>User</option>
             <option value='Admin'>Admin</option>
@@ -106,48 +130,23 @@ const UserInfoUpdate = () => {
         </div>
       </div>
 
-      <div className='max-w-4xl w-8/12 mx-auto bg-white p-8 border border-gray-200 rounded-lg shadow'>
+      <div className='max-w-4xl w-8/12 mx-auto bg-slate-950 p-8 border border-gray-200 rounded-lg shadow'>
         <h2 className='text-2xl font-bold mb-6 text-gray-800'>Update User Info</h2>
         <form onSubmit={handleSubmit} className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           <div>
-            <label htmlFor='firstname' className='block text-sm font-medium text-gray-700'>
-              First Name
+            <label htmlFor='name' className='block text-sm font-medium text-gray-700'>
+              Full Name
             </label>
             <input
               type='text'
-              name='firstname'
-              id='firstname'
-              value={formData.firstname}
+              name='name'
+              id='name'
+              value={formData.name}
               onChange={handleChange}
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
+              className='mt-1 block w-full px-3 bg-slate-800 text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
             />
           </div>
-          <div>
-            <label htmlFor='lastname' className='block text-sm font-medium text-gray-700'>
-              Last Name
-            </label>
-            <input
-              type='text'
-              name='lastname'
-              id='lastname'
-              value={formData.lastname}
-              onChange={handleChange}
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
-            />
-          </div>
-          <div>
-            <label htmlFor='username' className='block text-sm font-medium text-gray-700'>
-              Username
-            </label>
-            <input
-              type='text'
-              name='username'
-              id='username'
-              value={formData.username}
-              onChange={handleChange}
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
-            />
-          </div>
+
           <div>
             <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
               Email
@@ -158,7 +157,7 @@ const UserInfoUpdate = () => {
               id='email'
               value={formData.email}
               onChange={handleChange}
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
+              className='mt-1 block w-full px-3 bg-slate-800 text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
             />
           </div>
           <div>
@@ -171,22 +170,10 @@ const UserInfoUpdate = () => {
               id='phone'
               value={formData.phone}
               onChange={handleChange}
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
+              className='mt-1 block w-full px-3 bg-slate-800 text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
             />
           </div>
-          <div>
-            <label htmlFor='password' className='block text-sm font-medium text-gray-700'>
-              Password
-            </label>
-            <input
-              type='password'
-              name='password'
-              id='password'
-              value={formData.password}
-              onChange={handleChange}
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
-            />
-          </div>
+
           <div>
             <label htmlFor='gender' className='block text-sm font-medium text-gray-700'>
               Gender
@@ -196,7 +183,7 @@ const UserInfoUpdate = () => {
               id='gender'
               value={formData.gender}
               onChange={handleChange}
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
+              className='mt-1 block w-full px-3 bg-slate-800 text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
             >
               <option value=''>Select Gender</option>
               <option value='male'>Male</option>
@@ -205,7 +192,7 @@ const UserInfoUpdate = () => {
             </select>
           </div>
           <div>
-            <label htmlFor='password' className='block text-sm font-medium text-gray-700'>
+            <label htmlFor='age' className='block text-sm font-medium text-gray-700'>
               Age
             </label>
             <input
@@ -214,7 +201,7 @@ const UserInfoUpdate = () => {
               id='age'
               value={formData.age}
               onChange={handleChange}
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
+              className='mt-1 block w-full px-3 bg-slate-800 text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-300'
             />
           </div>
           <div>
