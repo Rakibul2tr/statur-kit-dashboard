@@ -86,11 +86,11 @@ const LoginV2 = ({ mode }) => {
   const onsubmitHendel = e => {
     e.preventDefault()
 
-    // if (email == '') {
-    //   alert('please check your email')
-    // } else if (password == '') {
-    //   alert('please check your password')
-    // }
+    if (email == '') {
+      alert('please check your email')
+    } else if (password == '') {
+      alert('please check your password')
+    }
 
     console.log('given Email', email)
     console.log('given pass', password)
@@ -108,8 +108,8 @@ const LoginV2 = ({ mode }) => {
 
   useEffect(() => {
     if (isSuccess) {
-      // localStorage.setItem('user', JSON.stringify(data))
-      // router.push('/dashboard')
+      localStorage.setItem('user', JSON.stringify(data))
+      router.push('/dashboard')
     } else if (isError) {
       console.log('error check')
     }
