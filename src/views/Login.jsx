@@ -80,7 +80,7 @@ const LoginV2 = ({ mode }) => {
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
   // redux data fetching
-  const [loginUser, { data, isLoading, isSuccess, isError }] = useLoginUserMutation()
+  const [loginUser, { data, isLoading, isSuccess, isError, error }] = useLoginUserMutation()
 
   // login hendel
   const onsubmitHendel = e => {
@@ -98,10 +98,15 @@ const LoginV2 = ({ mode }) => {
     })
   }
 
+  console.log('isSuccess', isSuccess)
+  console.log('user', data)
+  console.log('isError', isError)
+  console.log('error', error)
+
   useEffect(() => {
     if (isSuccess) {
-      localStorage.setItem('user', JSON.stringify(data))
-      router.push('/dashboard')
+      // localStorage.setItem('user', JSON.stringify(data))
+      // router.push('/dashboard')
     } else if (isError) {
       console.log('error check')
     }
