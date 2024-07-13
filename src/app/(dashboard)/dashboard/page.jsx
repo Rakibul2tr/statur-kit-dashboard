@@ -1,8 +1,30 @@
+'use client'
+import { useEffect, useState } from 'react'
+
 import LiveScoreCard from '../../components/liveScoreCard'
 
 import ListsComponent from '../../components/ListsComponent'
 
 export default function Page() {
+  const [userData, setUserData] = useState()
+
+  console.log('user', userData)
+
+  useEffect(() => {
+    const localData = async () => {
+      const data = localStorage.getItem('user')
+      const user = JSON.parse(data)
+
+      if (user) {
+        setUserData(user)
+      } else {
+        return
+      }
+    }
+
+    localData()
+  }, [])
+
   return (
     <>
       <div className='flex flex-wrap '>
