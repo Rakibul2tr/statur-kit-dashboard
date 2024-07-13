@@ -86,11 +86,14 @@ const LoginV2 = ({ mode }) => {
   const onsubmitHendel = e => {
     e.preventDefault()
 
-    if (email == '') {
-      alert('please check your email')
-    } else if (password == '') {
-      alert('please check your password')
-    }
+    // if (email == '') {
+    //   alert('please check your email')
+    // } else if (password == '') {
+    //   alert('please check your password')
+    // }
+
+    console.log('given Email', email)
+    console.log('given pass', password)
 
     loginUser({
       email: email,
@@ -141,9 +144,8 @@ const LoginV2 = ({ mode }) => {
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
             <Typography>Please sign-in to your account and start the adventure</Typography>
           </div>
-          <form noValidate autoComplete='off' onSubmit={onsubmitHendel} className='flex flex-col gap-5'>
+          <form noValidate onSubmit={onsubmitHendel} className='flex flex-col gap-5'>
             <CustomTextField
-              autoFocus
               fullWidth
               setValue={e => setEmail(e.target.value)}
               label='Email or Username'
