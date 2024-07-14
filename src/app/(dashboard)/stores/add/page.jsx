@@ -10,7 +10,7 @@ export default function Page() {
     title: '',
     description: '',
     photo_url: '',
-    tax_percentage: 0
+    discount_percent: 0
   })
 
   const [userData, setUserData] = useState({})
@@ -29,27 +29,30 @@ export default function Page() {
     }
 
     localData()
-
+  }, [])
+  useEffect(() => {
     if (isSuccess) {
       alert('created succesfull')
     } else if (error) {
-      alert('check error', error)
+      alert('Your category id is over. please gitve valid id.')
+      console.log(error.data.category[0])
     }
   }, [isSuccess, error])
 
-  // console.log('user', userData)
+  console.log('error', error)
 
   const handleChange = e => {
     const { name, value } = e.target
 
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'discount_percent' || name === 'category' ? parseFloat(value) : value
     }))
   }
 
   const handleSubmit = async e => {
     e.preventDefault()
+    console.log('product', formData)
 
     try {
       const token = userData.token
@@ -58,13 +61,6 @@ export default function Page() {
     } catch (error) {
       console.error('Error submitting form data:', error)
     }
-
-    // createProduct({
-    //   token: userData.token,
-    //   formData: formData
-    // })
-
-    // Submit formData to your backend or process it as needed
   }
 
   return (
@@ -168,8 +164,8 @@ export default function Page() {
           <label className='block text-white font-bold mb-2'>Tax Percentage:</label>
           <input
             type='number'
-            name='tax_percentage'
-            value={formData.tax_percentage}
+            name='discount_percent'
+            value={formData.discount_percent}
             onChange={handleChange}
             className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
           />

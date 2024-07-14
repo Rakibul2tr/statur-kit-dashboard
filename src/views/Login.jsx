@@ -59,7 +59,10 @@ const MaskImg = styled('img')({
 
 const LoginV2 = ({ mode }) => {
   // States
-  const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
+  // const [email, setEmail] = useState('')
+  // const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -83,18 +86,8 @@ const LoginV2 = ({ mode }) => {
   const [loginUser, { data, isLoading, isSuccess, isError, error }] = useLoginUserMutation()
 
   // login hendel
-  const onsubmitHendel = e => {
+  const handleSubmit = e => {
     e.preventDefault()
-
-    if (email == '') {
-      alert('please check your email')
-    } else if (password == '') {
-      alert('please check your password')
-    }
-
-    console.log('given Email', email)
-    console.log('given pass', password)
-
     loginUser({
       email: email,
       password: password
@@ -117,8 +110,9 @@ const LoginV2 = ({ mode }) => {
 
   if (isLoading) {
     return (
-      <div className='flex items-center justify-center'>
+      <div className='flex-col items-center justify-center w-full h-screen'>
         <h1>Loading...</h1>
+        <h3>Please wiat some munites</h3>
       </div>
     )
   }
@@ -144,44 +138,54 @@ const LoginV2 = ({ mode }) => {
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
             <Typography>Please sign-in to your account and start the adventure</Typography>
           </div>
-          <form noValidate onSubmit={onsubmitHendel} className='flex flex-col gap-5'>
-            <CustomTextField
-              fullWidth
-              setValue={e => setEmail(e.target.value)}
-              label='Email or Username'
-              placeholder='Enter your email or username'
-            />
-            <CustomTextField
-              fullWidth
-              label='Password'
-              placeholder='············'
-              id='outlined-adornment-password'
-              type={isPasswordShown ? 'text' : 'password'}
-              setValue={e => setPassword(e.target.value)}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
-                      <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
-            <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
-              <FormControlLabel control={<Checkbox />} label='Remember me' />
-              <Typography className='text-end' color='primary' component={Link}>
-                Forgot password?
-              </Typography>
+
+          <form className='space-y-6' onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
+                Email address
+              </label>
+              <input
+                id='email'
+                name='email'
+                type='email'
+                autoComplete='email'
+                required
+                className='w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
             </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Login
-            </Button>
-            <div className='flex justify-center items-center flex-wrap gap-2'>
-              <Typography>New on our platform?</Typography>
-              <Typography component={Link} color='primary'>
-                Create an account
-              </Typography>
+            <div>
+              <label htmlFor='password' className='block text-sm font-medium text-gray-700'>
+                Password
+              </label>
+              <div className='relative'>
+                <input
+                  id='password'
+                  name='password'
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete='current-password'
+                  required
+                  className='w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+                <button
+                  type='button'
+                  className='absolute inset-y-0 right-0 flex items-center px-3 text-sm font-medium text-gray-700 focus:outline-none h-3 top-3'
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
+            <div>
+              <button
+                type='submit'
+                className='cursor-pointer w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+              >
+                Sign In
+              </button>
             </div>
           </form>
         </div>

@@ -21,7 +21,7 @@ export default function Page() {
   const [userData, setUserData] = useState({})
   const [showModal, setShowModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState({})
-  const { data: users, isSuccess } = useAlllUsersDataGetQuery({ token: userData.token })
+  const { data: users, isSuccess } = useAlllUsersDataGetQuery(userData ? { token: userData.token } : null)
 
   // const [updateProduct, { data, isSuccess: success, error }] = useUpdateProductMutation()
   // console.log('userData', userData)
@@ -305,5 +305,3 @@ export default function Page() {
     </div>
   )
 }
-
-
