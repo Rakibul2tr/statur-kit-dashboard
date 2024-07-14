@@ -149,6 +149,7 @@ const LoginV2 = ({ mode }) => {
                 name='email'
                 type='email'
                 autoComplete='email'
+                placeholder='Enter your email'
                 required
                 className='w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'
                 value={email}
@@ -168,6 +169,7 @@ const LoginV2 = ({ mode }) => {
                   required
                   className='w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'
                   value={password}
+                  placeholder='Enter your password'
                   onChange={e => setPassword(e.target.value)}
                 />
                 <button
