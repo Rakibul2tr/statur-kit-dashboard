@@ -110,9 +110,9 @@ const LoginV2 = ({ mode }) => {
 
   if (isLoading) {
     return (
-      <div className='flex-col items-center justify-center w-full h-screen'>
-        <h1>Loading...</h1>
-        <h3>Please wiat some munites</h3>
+      <div className='flex-col items-center justify-center w-full h-screen '>
+        <h1 className='text-center'>Loading...</h1>
+        <h3 className='text-center'>Please wait some minutes</h3>
       </div>
     )
   }
