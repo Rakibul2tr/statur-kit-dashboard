@@ -3,37 +3,50 @@ import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
-import {
-  useCreateProductCategoryMutation,
-  useDeleteCategoryMutation,
-  useProductCategoryQuery,
-  useUpdateProductCategoryMutation
-} from '@/redux/api/apiSlice'
 import Modal from '../../../components/Modal'
+
+import {
+  useDeleteProgramMutation,
+  useProgramContentQuery,
+  useProgramCreateMutation,
+  useUpdateProgramDataMutation
+} from '@/redux/api/apiSlice'
 
 const theadData = [
   {
-    category_id: 'category Id',
-    category_title: 'category Title',
-    description: 'description',
-    photo: 'photo',
-    action: 'Action'
+    content_id: 'content Id',
+    program_Id: 'Program Id',
+    program_name: 'Program name',
+    program_image: 'Program image',
+    title: 'title',
+    description: 'Description',
+    photo_url: 'photo_url',
+    actions: 'actions'
   }
 ]
 
 export default function Page() {
   const [userData, setUserData] = useState({})
   const [showModal, setShowModal] = useState(false)
-  const [createCategoryModal, setCreateCategoryModal] = useState(false)
+  const [createProgramModal, setCreateProgramModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState({})
 
-  const { data: allCategory, isSuccess, error } = useProductCategoryQuery(userData ? { token: userData?.token } : null)
+  const { data: programsContent, isSuccess } = useProgramContentQuery({ token: userData.token })
 
-  const [updateProductCategory, { isSuccess: success, error: updateError }] = useUpdateProductCategoryMutation()
-  const [createProductCategory, { isSuccess: createSuccess, error: CreateError }] = useCreateProductCategoryMutation()
-  const [deleteCategory, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteCategoryMutation()
+  const [updateProgramData, { data, isSuccess: success, error }] = useUpdateProgramDataMutation()
 
-  // data get from local storage
+  const [programCreate, { isSuccess: createSuccess, error: createError }] = useProgramCreateMutation()
+  const [deleteProgram, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteProgramMutation()
+
+  const [formData, setFormData] = useState({
+    id: selectedItem.id || 1,
+    title: selectedItem.title || '',
+    description: selectedItem.description || '',
+    photo_url: selectedItem.photo_url || '',
+    is_active: true
+  })
+
+  // console.log('programsContent', programsContent)
   useEffect(() => {
     const localData = async () => {
       const data = localStorage.getItem('user')
@@ -48,40 +61,30 @@ export default function Page() {
 
     localData()
 
-    if (error) {
+    if (success) {
+      alert('updated Successful')
+      setShowModal(false)
+    } else if (error) {
       console.log(error)
     }
-  }, [isSuccess, allCategory, error])
+
+    setFormData({
+      id: selectedItem?.id,
+      title: selectedItem?.title,
+      description: selectedItem?.description,
+      photo_url: selectedItem?.photo_url,
+      is_active: true
+    })
+  }, [selectedItem, error, success])
 
   // modal for data update
-  useEffect(() => {
-    setUpdateData({
-      category: selectedItem?.id || null,
-      title: selectedItem?.title || '',
-      description: selectedItem?.description || '',
-      photo_url: selectedItem?.photo_url || ''
-    })
 
-    if (success) {
-      alert('updated successful')
-    } else if (updateError) {
-      alert(updateError)
-    }
-  }, [selectedItem, success, updateError])
-
-  //   formData is her
-
-  const [updateData, setUpdateData] = useState({
-    category: selectedItem?.id || null,
-    title: selectedItem?.title || '',
-    description: selectedItem?.description || '',
-    photo_url: selectedItem?.photo_url || ''
-  })
+  // console.log('user', typeof selectedItem.id)
 
   const handleChange = e => {
     const { name, value } = e.target
 
-    setUpdateData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }))
@@ -92,61 +95,68 @@ export default function Page() {
   const toggleModal = item => {
     setSelectedItem(item)
     setShowModal(true)
-    setCreateCategoryModal(true)
   }
 
   //  modal close handel
 
   const closeModal = () => {
-    setUpdateData({
-      category: null,
+    setFormData({
+      id: null,
       title: '',
       description: '',
-      photo_url: ''
+      photo_url: '',
+      is_active: true
     })
     setShowModal(false)
-    setCreateCategoryModal(false)
+    setCreateProgramModal(false)
   }
 
-  const id = selectedItem.id
+  //  update program data handel
   const token = userData.token
 
-  // category data update handel
   const updateHandleSubmit = async e => {
     e.preventDefault()
-    console.log('category', updateData, token, id)
-    await updateProductCategory({ token, updateData, id }).unwrap()
+
+    try {
+      await updateProgramData({
+        token: token,
+        formData: formData,
+        id: selectedItem.id
+      })
+    } catch (error) {
+      console.error('Error submitting form data:', error)
+    }
   }
 
-  // create a product category
+  // create data for program handel
 
-  const categoryCreateHandel = e => {
+  const createHandleSubmit = e => {
     e.preventDefault()
-    let categoryData = {
-      title: updateData.title,
-      description: updateData.description,
-      photo_url: updateData.photo_url
+    let sendFormData = {
+      title: formData.title,
+      description: formData.description,
+      photo_url: formData.photo_url
     }
 
-    createProductCategory({ token, categoryData })
+    programCreate({ sendFormData, token })
   }
 
   useEffect(() => {
     if (createSuccess) {
-      alert('Category Created successful')
-    } else if (CreateError) {
-      alert('Created field!')
+      alert('Created successful')
+    } else if (createError) {
+      console.log('create program error', createError)
     }
-  }, [createSuccess, CreateError])
+  }, [createSuccess, createError])
 
-  //category delete handel
-  const categoryDeleteHandel = id => {
-    deleteCategory({ id: id, token: userData?.token })
+  // delete a program handel
+  const programDeleteHandel = id => {
+    deleteProgram({ id: id, token: userData?.token })
   }
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Product is Deleted')
+      alert('Program is Deleted')
     } else if (deleteError) {
       // alert(deleteError)
       console.log('error', deleteError)
@@ -157,12 +167,12 @@ export default function Page() {
     <div className=' p-2'>
       {/* main title  */}
       <div className='main-header bg-slate-900 flex flex-row items-center justify-between shadow-md shadow-red-400 py-3 px-3 rounded-t-md'>
-        <h1 className='text-slate-300 text-2xl '>Products Category List</h1>
+        <h1 className='text-slate-300 text-2xl '>Programs List</h1>
         <button
+          onClick={() => setCreateProgramModal(true)}
           className='p-3 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 cursor-pointer'
-          onClick={() => setCreateCategoryModal(true)}
         >
-          Add Category
+          Add Program
         </button>
       </div>
       {/* search box */}
@@ -199,7 +209,7 @@ export default function Page() {
                         <th
                           key={val}
                           scope='col'
-                          className='bg-slate-800 px-6 py-3 text-xs font-bold text-left text-gray-600 uppercase '
+                          className='bg-slate-800 px-1 py-3 text-xs font-bold text-center text-gray-600 uppercase '
                         >
                           {val}
                         </th>
@@ -207,24 +217,28 @@ export default function Page() {
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-gray-200 overflow-x-auto'>
-                    {allCategory?.map(item => {
+                    {programsContent?.map(item => {
+                      console.log('programsContent item', item)
+
                       return (
                         <tr key={item.id}>
-                          <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
-                          {item?.title && (
-                            <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
-                          )}
-                          {item?.description && (
-                            <td className='px-6 py-4 text-sm text-slate-300 max-w-48 whitespace-nowrap overflow-hidden'>
-                              {item.description}
-                            </td>
-                          )}
-                          {item?.photo_url && (
-                            <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                              <Image src={item.photo_url} alt='image' width={50} height={40} className='rounded ' />
-                            </td>
-                          )}
+                          <td className='px-4 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
+                          <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.program.id}</td>
+                          <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden'>
+                            {item.program.title}
+                          </td>
+                          <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>
+                            <Image src={item.program.photo_url} alt='' width={50} height={40} className='rounded' />
+                          </td>
+                          <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
 
+                          <td className='px-4 max-w-48 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis'>
+                            {item?.description}
+                          </td>
+
+                          <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>
+                            <Image src={item.photo_url} alt='' width={50} height={40} className='rounded' />
+                          </td>
                           <td className=' text-sm font-medium text-right whitespace-nowrap'>
                             <div className='flex justify-between mr-2'>
                               <div className='bg-[#ffff00] px-2 py-1 rounded-md '>
@@ -235,7 +249,7 @@ export default function Page() {
                               <div className='bg-[#ffff00] px-2 py-1 rounded-md'>
                                 <button
                                   className='bg-[#ffff00] cursor-pointer'
-                                  onClick={() => categoryDeleteHandel(item.id)}
+                                  onClick={() => programDeleteHandel(item.id)}
                                 >
                                   <i className='tabler-trash text-red-600'></i>
                                 </button>
@@ -252,7 +266,6 @@ export default function Page() {
           </div>
         </div>
       </div>
-      {/* category data update form */}
       {showModal ? (
         <Modal>
           <button
@@ -277,25 +290,25 @@ export default function Page() {
             </svg>
           </button>
           <div className='pb-3'>
-            <h2 className='text-slate-800 text-center'>Update a category</h2>
+            <h2 className='text-slate-800 text-center'>Update a Program</h2>
           </div>
           <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Category ID:</label>
+              <label className='block text-white font-bold mb-2'>Program Number :</label>
               <input
                 type='number'
-                name='category'
-                defaultValue={updateData?.category}
+                name='id'
+                defaultValue={formData?.id}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
             </div>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Title:</label>
+              <label className='block text-white font-bold mb-2'>Program Title:</label>
               <input
                 type='text'
                 name='title'
-                defaultValue={updateData?.title}
+                defaultValue={formData?.title}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -304,7 +317,7 @@ export default function Page() {
               <label className='block text-white font-bold mb-2'>Description:</label>
               <textarea
                 name='description'
-                defaultValue={updateData?.description}
+                defaultValue={formData?.description}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -315,22 +328,22 @@ export default function Page() {
               <input
                 type='text'
                 name='photo_url'
-                defaultValue={updateData?.photo_url}
+                defaultValue={formData?.photo_url}
                 onChange={handleChange}
                 className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
             </div>
+
             <button
               type='submit'
               className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
             >
-              Update Category
+              Update
             </button>
           </form>
         </Modal>
       ) : null}
-      {/* category data create form */}
-      {createCategoryModal ? (
+      {createProgramModal ? (
         <Modal>
           <button
             onClick={() => closeModal()}
@@ -354,15 +367,15 @@ export default function Page() {
             </svg>
           </button>
           <div className='pb-3'>
-            <h2 className='text-slate-800 text-center'>Create a category</h2>
+            <h2 className='text-slate-800 text-center'>Create a Program</h2>
           </div>
-          <form onSubmit={categoryCreateHandel} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+          <form onSubmit={createHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Title:</label>
+              <label className='block text-white font-bold mb-2'>Program Title:</label>
               <input
                 type='text'
                 name='title'
-                defaultValue={updateData?.title}
+                defaultValue={formData?.title}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -371,7 +384,7 @@ export default function Page() {
               <label className='block text-white font-bold mb-2'>Description:</label>
               <textarea
                 name='description'
-                defaultValue={updateData?.description}
+                defaultValue={formData?.description}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -382,16 +395,17 @@ export default function Page() {
               <input
                 type='text'
                 name='photo_url'
-                defaultValue={updateData?.photo_url}
+                defaultValue={formData?.photo_url}
                 onChange={handleChange}
                 className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
             </div>
+
             <button
               type='submit'
               className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
             >
-              Create Category
+              Create
             </button>
           </form>
         </Modal>

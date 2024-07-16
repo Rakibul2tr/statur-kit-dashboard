@@ -5,6 +5,7 @@ import Image from 'next/image'
 
 import Modal from '../../../components/Modal'
 import { useProgramDataGetQuery, useUpdateProgramDataMutation } from '@/redux/api/programsApislice'
+import { useDeleteProgramMutation, useProgramCreateMutation } from '@/redux/api/apiSlice'
 
 const theadData = [
   {
@@ -12,18 +13,21 @@ const theadData = [
     title: 'title',
     description: 'Description',
     photo_url: 'photo_url',
-    is_active: true
+    actions: 'actions'
   }
 ]
 
 export default function Page() {
   const [userData, setUserData] = useState({})
   const [showModal, setShowModal] = useState(false)
+  const [createProgramModal, setCreateProgramModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState({})
 
   const { data: programs, isSuccess } = useProgramDataGetQuery({ token: userData.token })
 
   const [updateProgramData, { data, isSuccess: success, error }] = useUpdateProgramDataMutation()
+  const [programCreate, { isSuccess: createSuccess, error: createError }] = useProgramCreateMutation()
+  const [deleteProgram, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteProgramMutation()
 
   const [formData, setFormData] = useState({
     id: selectedItem.id || 1,
@@ -49,7 +53,7 @@ export default function Page() {
     localData()
 
     if (success) {
-      alert('updated Succesfull')
+      alert('updated Successful')
       setShowModal(false)
     } else if (error) {
       console.log(error)
@@ -95,14 +99,14 @@ export default function Page() {
       is_active: true
     })
     setShowModal(false)
+    setCreateProgramModal(false)
   }
 
-  //  data update handel
-  const updatehandleSubmit = async e => {
-    e.preventDefault()
-    const token = userData.token
+  //  update program data handel
+  const token = userData.token
 
-    console.log(formData, token)
+  const updateHandleSubmit = async e => {
+    e.preventDefault()
 
     try {
       await updateProgramData({
@@ -115,12 +119,50 @@ export default function Page() {
     }
   }
 
+  // create data for program handel
+
+  const createHandleSubmit = e => {
+    e.preventDefault()
+    let sendFormData = {
+      title: formData.title,
+      description: formData.description,
+      photo_url: formData.photo_url
+    }
+
+    programCreate({ sendFormData, token })
+  }
+
+  useEffect(() => {
+    if (createSuccess) {
+      alert('Created successful')
+    } else if (createError) {
+      console.log('create program error', createError)
+    }
+  }, [createSuccess, createError])
+
+  // delete a program handel
+  const programDeleteHandel = id => {
+    deleteProgram({ id: id, token: userData?.token })
+  }
+
+  useEffect(() => {
+    if (deleteSuccess) {
+      alert('Program is Deleted')
+    } else if (deleteError) {
+      // alert(deleteError)
+      console.log('error', deleteError)
+    }
+  }, [deleteSuccess, deleteError])
+
   return (
     <div className=' p-2'>
       {/* main title  */}
       <div className='main-header bg-slate-900 flex flex-row items-center justify-between shadow-md shadow-red-400 py-3 px-3 rounded-t-md'>
         <h1 className='text-slate-300 text-2xl '>Programs List</h1>
-        <button className='p-3 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 cursor-pointer'>
+        <button
+          onClick={() => setCreateProgramModal(true)}
+          className='p-3 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 cursor-pointer'
+        >
           Add Program
         </button>
       </div>
@@ -179,18 +221,20 @@ export default function Page() {
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
                             <Image src={item.photo_url} alt='' width={50} height={40} className='rounded' />
                           </td>
-
-                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item?.is_active}</td>
-
                           <td className=' text-sm font-medium text-right whitespace-nowrap'>
                             <div className='flex justify-between mr-2'>
                               <div className='bg-[#ffff00] px-2 py-1 rounded-md '>
                                 <button className='bg-[#ffff00] cursor-pointer' onClick={() => toggleModal(item)}>
-                                  Update
+                                  <i className='tabler-edit'></i>
                                 </button>
                               </div>
                               <div className='bg-[#ffff00] px-2 py-1 rounded-md'>
-                                <button className='bg-[#ffff00]'>Delete</button>
+                                <button
+                                  className='bg-[#ffff00] cursor-pointer'
+                                  onClick={() => programDeleteHandel(item.id)}
+                                >
+                                  <i className='tabler-trash text-red-600'></i>
+                                </button>
                               </div>
                             </div>
                           </td>
@@ -227,9 +271,12 @@ export default function Page() {
               <path d='M6 6l12 12' />
             </svg>
           </button>
-          <form onSubmit={updatehandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+          <div className='pb-3'>
+            <h2 className='text-slate-800 text-center'>Update a Program</h2>
+          </div>
+          <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Category Id :</label>
+              <label className='block text-white font-bold mb-2'>Program Number :</label>
               <input
                 type='number'
                 name='id'
@@ -239,7 +286,7 @@ export default function Page() {
               />
             </div>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Title:</label>
+              <label className='block text-white font-bold mb-2'>Program Title:</label>
               <input
                 type='text'
                 name='title'
@@ -273,7 +320,74 @@ export default function Page() {
               type='submit'
               className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
             >
-              Create Product
+              Update
+            </button>
+          </form>
+        </Modal>
+      ) : null}
+      {createProgramModal ? (
+        <Modal>
+          <button
+            onClick={() => closeModal()}
+            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+          >
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='24'
+              height='24'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              className='icon icon-tabler icons-tabler-outline icon-tabler-x'
+            >
+              <path stroke='none' d='M0 0h24v24H0z' fill='none' />
+              <path d='M18 6l-12 12' />
+              <path d='M6 6l12 12' />
+            </svg>
+          </button>
+          <div className='pb-3'>
+            <h2 className='text-slate-800 text-center'>Create a Program</h2>
+          </div>
+          <form onSubmit={createHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Program Title:</label>
+              <input
+                type='text'
+                name='title'
+                defaultValue={formData?.title}
+                onChange={handleChange}
+                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+              />
+            </div>
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Description:</label>
+              <textarea
+                name='description'
+                defaultValue={formData?.description}
+                onChange={handleChange}
+                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+              />
+            </div>
+
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Photo URL:</label>
+              <input
+                type='text'
+                name='photo_url'
+                defaultValue={formData?.photo_url}
+                onChange={handleChange}
+                className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+              />
+            </div>
+
+            <button
+              type='submit'
+              className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
+            >
+              Create
             </button>
           </form>
         </Modal>

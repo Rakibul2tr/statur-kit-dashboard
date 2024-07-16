@@ -116,18 +116,17 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
         <MenuSection>
           <SubMenu label={'Stores'} icon={<i className='tabler-shopping-cart' />}>
             <MenuItem href={`/stores/list`}>Store List</MenuItem>
-            <MenuItem href={`/stores/add`}>Add new Store</MenuItem>
+            {/* <MenuItem href={`/stores/add`}>Add new Store</MenuItem> */}
             <MenuItem href={`/stores/categorylist`}>Store Category List</MenuItem>
-            <MenuItem href={`/stores/addCategory`}>Add Store Category</MenuItem>
+            {/* <MenuItem href={`/stores/addCategory`}>Add Store Category</MenuItem> */}
           </SubMenu>
         </MenuSection>
         {/* program item */}
         <MenuSection>
           <SubMenu label={'Programs'} icon={<i className='tabler-shopping-cart' />}>
             <MenuItem href={`/programs/list`}>Program List</MenuItem>
-            <MenuItem href={`/programs/add`}>Add new Program</MenuItem>
-            <MenuItem href={`/programs/update`}>Program update</MenuItem>
-            <MenuItem href={`/programs/delete`}>Program Delete</MenuItem>
+            <MenuItem href={`/programs/programContent`}>Program Content</MenuItem>
+            <MenuItem href={`/programs/programParticular`}>Program Particular</MenuItem>
           </SubMenu>
         </MenuSection>
         {/* Influencer menu */}

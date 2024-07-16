@@ -26,24 +26,6 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============forgot password api==============
-    // forgotPassword: builder.mutation({
-    //   query: data => ({
-    //     url: '/api/users/password/mail/',
-    //     method: 'POST',
-    //     body: data
-    //   })
-    // }),
-
-    //===============new password set api==============
-    // newPassword: builder.mutation({
-    //   query: data => ({
-    //     url: '/api/users/password/reset/',
-    //     method: 'POST',
-    //     body: data
-    //   })
-    // }),
-
     //===============User logOut api==============
     // userLogOut: builder.mutation({
     //   query: data => ({
@@ -57,31 +39,6 @@ export const apiSlice = createApi({
 
     //************************** user authentication end ************************* */
 
-    //============== user data Get api ===============
-    // getUserData: builder.query({
-    //   query: (data) => ({
-    //     url: "/user-data",
-    //     method: "GET",
-    //     headers: {
-    //       authorization: `Bearer ${data._token}`,
-    //     },
-    //   }),
-    // }),
-    //===============User password Change api==============
-    // passwordChange: builder.mutation({
-    //   query: (data) => ({
-    //     url: "/update-user-password",
-    //     method: "POST",
-    //     headers: {
-    //       authorization: `Bearer ${data.token}`,
-    //     },
-    //     body: {
-    //       current_password: data.current_password,
-    //       new_password: data.new_password,
-    //       new_password_confirmation: data.new_password_confirmation,
-    //     },
-    //   }),
-    // }),
     //============== users data Get api===============
     alllUsersDataGet: builder.query({
       query: ({ token }) => ({
@@ -122,18 +79,6 @@ export const apiSlice = createApi({
     }),
 
     //*********************** store screens api start **************** */
-    //===============product add  api==============
-
-    createProduct: builder.mutation({
-      query: ({ token, formData }) => ({
-        url: '/api/products/',
-        method: 'POST',
-        headers: {
-          authorization: `token ${token}`
-        },
-        body: formData
-      })
-    }),
 
     //============== all product Get api===============
 
@@ -147,11 +92,24 @@ export const apiSlice = createApi({
       })
     }),
 
+    //===============product add  api==============
+
+    createProduct: builder.mutation({
+      query: ({ token, formData }) => ({
+        url: '/api/products/',
+        method: 'POST',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: formData
+      })
+    }),
+
     //===============Product single update api==============
 
     updateProduct: builder.mutation({
       query: ({ token, formData, id }) => ({
-        url: `/api/products/${id}`,
+        url: `/api/products/${id}/`,
         method: 'PATCH',
         headers: {
           authorization: `token ${token}`,
@@ -161,20 +119,31 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============Product category get api==============Done
+    //===============delete single product api==============
+
+    deleteProduct: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/products/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //===============get Product category api==============Done
 
     productCategory: builder.query({
-      query: ({ token, categoryData }) => ({
+      query: ({ token }) => ({
         url: `/api/product-categories/`,
         method: 'GET',
         headers: {
           authorization: `token ${token}`
-        },
-        body: categoryData
+        }
       })
     }),
 
-    //===============Product category update api==============Done
+    //===============create Product category api==============Done
 
     createProductCategory: builder.mutation({
       query: ({ token, categoryData }) => ({
@@ -187,22 +156,33 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============Product category update api==============
+    //===============update Product category api==============
 
     updateProductCategory: builder.mutation({
-      query: ({ token, formData, id }) => ({
-        url: `/api/product-categories/${id}`,
+      query: ({ token, updateData, id }) => ({
+        url: `/api/product-categories/${id}/`,
         method: 'PATCH',
         headers: {
-          authorization: `token ${token}`
-
-          // 'Content-Type': 'application/json'
+          authorization: `token ${token}`,
+          'Content-Type': 'application/json'
         },
-        body: formData
+        body: updateData
       })
     }),
 
-    //****************** program screens api start ******************* */
+    //===============delete product category  api==============
+
+    deleteCategory: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/product-categories/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //************************** program screens api start ************************** */
     //============== program data Get api===============
     programDataGet: builder.query({
       query: data => ({
@@ -211,6 +191,19 @@ export const apiSlice = createApi({
         headers: {
           authorization: `token ${data?.token}`
         }
+      })
+    }),
+
+    //===============program create api==============
+
+    programCreate: builder.mutation({
+      query: ({ token, sendFormData }) => ({
+        url: `/api/products/`,
+        method: 'POST',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: sendFormData
       })
     }),
 
@@ -226,6 +219,16 @@ export const apiSlice = createApi({
       })
     }),
 
+    deleteProgram: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/programs/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
     //============== program details Get api===============
 
     programDetails: builder.query({
@@ -238,16 +241,15 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============program create api==============
+    //============== program details Get api===============
 
-    programCreate: builder.mutation({
-      query: ({ token, formData }) => ({
-        url: `/api/products/`,
-        method: 'POST',
+    programContent: builder.query({
+      query: data => ({
+        url: `/api/program-contents/`,
+        method: 'GET',
         headers: {
-          authorization: `token ${token}`
-        },
-        body: formData
+          authorization: `token ${data?.token}`
+        }
       })
     })
   })
@@ -263,23 +265,31 @@ export const {
   useForgotPasswordMutation,
   useNewPasswordMutation,
 
-  // authentication end======
+  //====== authentication end======
 
-  // users start
+  //========== users start==========
   useAlllUsersDataGetQuery,
   useUpdateUserMutation,
   usePersonalUserGetQuery,
 
-  // program screens start======
+  //===== program screens start======
   useProgramDataGetQuery,
+  useProgramCreateMutation,
+  useUpdateProgramDataMutation,
+  useDeleteProgramMutation,
 
-  // product start
+  //program content api
+  useProgramContentQuery,
+
+  //========= product Api start==========
   useCreateProductMutation,
   useUpdateProductMutation,
   useAllProductQuery,
+  useDeleteProductMutation,
 
-  // product category
+  //============ product category api=====
   useCreateProductCategoryMutation,
   useUpdateProductCategoryMutation,
-  useProductCategoryQuery
+  useProductCategoryQuery,
+  useDeleteCategoryMutation
 } = apiSlice

@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
-import { useAllProductQuery, useUpdateProductMutation } from '@/redux/api/apiSlice'
+import { useAllProductQuery, useDeleteProductMutation, useUpdateProductMutation } from '@/redux/api/apiSlice'
 import Modal from '../../../components/Modal'
 
 const theadData = [
@@ -18,9 +18,13 @@ const theadData = [
 export default function Page() {
   const [userData, setUserData] = useState({})
   const [showModal, setShowModal] = useState(false)
+
+  // const [refresh, setRefresh] = useState(false)
+  const [createProductModal, setCreateProductModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState({})
-  const { data: allProduct, isSuccess } = useAllProductQuery({ token: userData.token })
+  const { data: allProduct, isSuccess, refetch } = useAllProductQuery(userData ? { token: userData?.token } : null)
   const [updateProduct, { data, isSuccess: success, error }] = useUpdateProductMutation()
+  const [deleteProduct, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteProductMutation()
 
   const [formData, setFormData] = useState({
     category: selectedItem.category || 1,
@@ -60,11 +64,9 @@ export default function Page() {
       discount_percent: selectedItem?.discount_percent,
       is_active: true
     })
-  }, [selectedItem, success, allProduct, error])
+  }, [selectedItem, success, allProduct, error, refetch])
 
   // modal for data update
-
-  // console.log('user', typeof selectedItem.id)
 
   const handleChange = e => {
     const { name, value } = e.target
@@ -77,9 +79,13 @@ export default function Page() {
 
   //  modal open handel
 
-  const toggleModal = item => {
-    setSelectedItem(item)
-    setShowModal(true)
+  const toggleModal = (item, key) => {
+    if (key == 'update') {
+      setSelectedItem(item)
+      setShowModal(true)
+    } else {
+      setCreateProductModal(true)
+    }
   }
 
   //  modal close handel
@@ -94,14 +100,21 @@ export default function Page() {
       is_active: true
     })
     setShowModal(false)
+    setCreateProductModal(false)
   }
 
-  //  data update handel
-  const updatehandleSubmit = async e => {
+  //category data create
+  const createCategorySubmit = e => {
+    e.preventDefault()
+    console.log(createProductModal)
+  }
+
+  console.log(createProductModal)
+
+  // category data update handel
+  const updateHandleSubmit = async e => {
     e.preventDefault()
     const token = userData.token
-
-    console.log(formData, token)
 
     try {
       await updateProduct({
@@ -114,12 +127,29 @@ export default function Page() {
     }
   }
 
+  //single product delete handel
+  const productDeleteHandel = id => {
+    deleteProduct({ id: id, token: userData?.token })
+  }
+
+  useEffect(() => {
+    if (deleteSuccess) {
+      alert('Product is Deleted')
+      refetch()
+    } else if (deleteError) {
+      alert(deleteError)
+    }
+  }, [deleteSuccess, deleteError, refetch])
+
   return (
     <div className=' p-2'>
       {/* main title  */}
       <div className='main-header bg-slate-900 flex flex-row items-center justify-between shadow-md shadow-red-400 py-3 px-3 rounded-t-md'>
         <h1 className='text-slate-300 text-2xl '>Products List</h1>
-        <button className='p-3 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 cursor-pointer'>
+        <button
+          className='p-3 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 cursor-pointer'
+          onClick={() => toggleModal()}
+        >
           Add Product
         </button>
       </div>
@@ -184,12 +214,20 @@ export default function Page() {
                           <td className=' text-sm font-medium text-right whitespace-nowrap'>
                             <div className='flex justify-between mr-2'>
                               <div className='bg-[#ffff00] px-2 py-1 rounded-md '>
-                                <button className='bg-[#ffff00] cursor-pointer' onClick={() => toggleModal(item)}>
-                                  Update
+                                <button
+                                  className='bg-[#ffff00] cursor-pointer'
+                                  onClick={() => toggleModal(item, 'update')}
+                                >
+                                  <i className='tabler-edit'></i>
                                 </button>
                               </div>
                               <div className='bg-[#ffff00] px-2 py-1 rounded-md'>
-                                <button className='bg-[#ffff00]'>Delete</button>
+                                <button
+                                  className='bg-[#ffff00] cursor-pointer'
+                                  onClick={() => productDeleteHandel(item.id)}
+                                >
+                                  <i className='tabler-trash text-red-600'></i>
+                                </button>
                               </div>
                             </div>
                           </td>
@@ -203,6 +241,7 @@ export default function Page() {
           </div>
         </div>
       </div>
+      {/* product update  */}
       {showModal ? (
         <Modal>
           <button
@@ -226,16 +265,25 @@ export default function Page() {
               <path d='M6 6l12 12' />
             </svg>
           </button>
-          <form onSubmit={updatehandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+          <div className='pb-3'>
+            <h2 className='text-slate-800 text-center'>Update a product</h2>
+          </div>
+          <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Category Id :</label>
-              <input
-                type='number'
+              <label className='block text-white font-bold mb-2'>Product Category</label>
+
+              <select
                 name='category'
-                defaultValue={formData?.category}
+                value={formData.category}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
+              >
+                {productCategory.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.value}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className='mb-4'>
               <label className='block text-white font-bold mb-2'>Product Title:</label>
@@ -282,7 +330,101 @@ export default function Page() {
               type='submit'
               className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
             >
-              Create Product
+              Update Product
+            </button>
+          </form>
+        </Modal>
+      ) : null}
+      {/* product create */}
+      {createProductModal ? (
+        <Modal>
+          <button
+            onClick={() => closeModal()}
+            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+          >
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='24'
+              height='24'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              className='icon icon-tabler icons-tabler-outline icon-tabler-x'
+            >
+              <path stroke='none' d='M0 0h24v24H0z' fill='none' />
+              <path d='M18 6l-12 12' />
+              <path d='M6 6l12 12' />
+            </svg>
+          </button>
+          <div className='pb-3'>
+            <h2 className='text-slate-800 text-center'>Create a product</h2>
+          </div>
+
+          <form onSubmit={createCategorySubmit} className='max-w-xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Product Category Id :</label>
+              <select
+                name='category'
+                value={formData.category}
+                onChange={handleChange}
+                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+              >
+                {productCategory.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.value}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Product Title:</label>
+              <input
+                type='text'
+                name='title'
+                defaultValue={formData?.title}
+                onChange={handleChange}
+                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+              />
+            </div>
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Description:</label>
+              <textarea
+                name='description'
+                defaultValue={formData?.description}
+                onChange={handleChange}
+                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+              />
+            </div>
+
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Photo URL:</label>
+              <input
+                type='text'
+                name='photo_url'
+                defaultValue={formData?.photo_url}
+                onChange={handleChange}
+                className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+              />
+            </div>
+
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>discount Percentage:</label>
+              <input
+                type='number'
+                name='discount_percent'
+                defaultValue={formData?.discount_percent}
+                onChange={handleChange}
+                className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+              />
+            </div>
+            <button
+              type='submit'
+              className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
+            >
+              Create
             </button>
           </form>
         </Modal>
@@ -290,3 +432,14 @@ export default function Page() {
     </div>
   )
 }
+
+const productCategory = [
+  { id: 1, value: 'Diet' },
+  { id: 2, value: 'leg' },
+  { id: 3, value: 'body' },
+  { id: 4, value: 'hand' },
+  { id: 5, value: 'Category-5' },
+  { id: 6, value: 'Category-6' },
+  { id: 7, value: 'Category-7' },
+  { id: 8, value: 'Category-8' }
+]

@@ -1,19 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 
-// import userInfoReducer from './slices/userinfoSlice';
-// import favoritesProgramSlice from './slices/favoritesProgramSlice';
 
 import { apiSlice } from './api/apiSlice'
-import { programsApislice } from './api/programsApislice'
 
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer
-
-  // [programsApislice.reducerPath]: programsApislice.reducer
-
-  // Add other slices here if needed
-  // userInfo: userInfoReducer,
-  // favoritesProgram: favoritesProgramSlice,
 })
 
 export const store = configureStore({
@@ -22,7 +13,7 @@ export const store = configureStore({
     getDefaultMiddleware({
       immutableCheck: false,
       serializableCheck: false
-    }).concat(apiSlice.middleware, programsApislice.middleware)
+    }).concat(apiSlice.middleware)
 })
 
 export default store
