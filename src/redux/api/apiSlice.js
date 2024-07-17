@@ -80,7 +80,7 @@ export const apiSlice = createApi({
 
     //*********************** store screens api start **************** */
 
-    //============== all product Get api===============
+    //==============Get all product api===============
 
     allProduct: builder.query({
       query: ({ token }) => ({
@@ -92,7 +92,7 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============product add  api==============
+    //===============Create a product  api==============
 
     createProduct: builder.mutation({
       query: ({ token, formData }) => ({
@@ -105,7 +105,7 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============Product single update api==============
+    //===============update a Product api==============
 
     updateProduct: builder.mutation({
       query: ({ token, formData, id }) => ({
@@ -119,7 +119,7 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============delete single product api==============
+    //===============delete a product api==============
 
     deleteProduct: builder.mutation({
       query: ({ token, id }) => ({
@@ -183,7 +183,7 @@ export const apiSlice = createApi({
     }),
 
     //************************** program screens api start ************************** */
-    //============== program data Get api===============
+    //==============Get all program data api===============
     programDataGet: builder.query({
       query: data => ({
         url: '/api/programs/',
@@ -194,7 +194,7 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============program create api==============
+    //===============Create a program api==============
 
     programCreate: builder.mutation({
       query: ({ token, sendFormData }) => ({
@@ -207,7 +207,7 @@ export const apiSlice = createApi({
       })
     }),
 
-    //============== program data Get api===============
+    //============== update a program api===============
     updateProgramData: builder.mutation({
       query: data => ({
         url: `/api/programs/${data.id}/`,
@@ -219,6 +219,7 @@ export const apiSlice = createApi({
       })
     }),
 
+    // ==============delete a program api ==============
     deleteProgram: builder.mutation({
       query: ({ token, id }) => ({
         url: `/api/programs/${id}/`,
@@ -241,7 +242,8 @@ export const apiSlice = createApi({
       })
     }),
 
-    //============== program details Get api===============
+    //************************** program content api start ************************** */
+    //==============Get program content api===============
 
     programContent: builder.query({
       query: data => ({
@@ -251,7 +253,47 @@ export const apiSlice = createApi({
           authorization: `token ${data?.token}`
         }
       })
+    }),
+
+    //==============create program content api===============
+
+    createProgramContent: builder.mutation({
+      query: data => ({
+        url: `/api/program-contents/`,
+        method: 'POST',
+        headers: {
+          authorization: `token ${data?.token}`
+        },
+        body: data.formData
+      })
+    }),
+
+    //==============update program content api===============
+
+    updateProgramContent: builder.mutation({
+      query: data => ({
+        url: `/api/program-contents/${data.id}`,
+        method: 'PATCH',
+        headers: {
+          authorization: `token ${data?.token}`
+        },
+        body: data.formData
+      })
+    }),
+
+    //===============delete a program content  api==============
+
+    deleteProgramContent: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/program-contents/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
     })
+
+    //============== program content Get api===============
   })
 })
 
@@ -280,6 +322,9 @@ export const {
 
   //program content api
   useProgramContentQuery,
+  useCreateProgramContentMutation,
+  useUpdateProgramContentMutation,
+  useDeleteProgramContentMutation,
 
   //========= product Api start==========
   useCreateProductMutation,

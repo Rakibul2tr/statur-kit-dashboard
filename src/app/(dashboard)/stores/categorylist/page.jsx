@@ -92,7 +92,6 @@ export default function Page() {
   const toggleModal = item => {
     setSelectedItem(item)
     setShowModal(true)
-    setCreateCategoryModal(true)
   }
 
   //  modal close handel

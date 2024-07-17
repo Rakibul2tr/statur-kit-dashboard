@@ -55,9 +55,9 @@ const LoginV2 = () => {
       localStorage.setItem('user', JSON.stringify(data))
       router.push('/dashboard')
     } else if (isError) {
-      console.log('error check')
+      console.log('error check', error)
     }
-  }, [isSuccess, router, isError, data])
+  }, [isSuccess, router, isError, data, error])
 
   if (isLoading) {
     return (
