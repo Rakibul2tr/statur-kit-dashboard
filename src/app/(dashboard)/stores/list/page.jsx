@@ -1,7 +1,14 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
-import { useAllProductQuery, useDeleteProductMutation, useUpdateProductMutation } from '@/redux/api/apiSlice'
+import Image from 'next/image'
+
+import {
+  useAllProductQuery,
+  useCreateProductMutation,
+  useDeleteProductMutation,
+  useUpdateProductMutation
+} from '@/redux/api/apiSlice'
 import Modal from '../../../components/Modal'
 
 const theadData = [
@@ -10,6 +17,7 @@ const theadData = [
     title: 'title',
     category_id: 'category Id',
     category_title: 'category Title',
+    product_Image: 'image',
     discount: 'Discount Percent',
     action: 'Action'
   }
@@ -24,6 +32,7 @@ export default function Page() {
   const [selectedItem, setSelectedItem] = useState({})
   const { data: allProduct, isSuccess, refetch } = useAllProductQuery(userData ? { token: userData?.token } : null)
   const [updateProduct, { data, isSuccess: success, error }] = useUpdateProductMutation()
+  const [createProduct, { isSuccess: createSuccess, error: createError }] = useCreateProductMutation()
   const [deleteProduct, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteProductMutation()
 
   const [formData, setFormData] = useState({
@@ -48,23 +57,15 @@ export default function Page() {
     }
 
     localData()
-
-    if (success) {
-      alert('updated Succesfull')
-      setShowModal(false)
-    } else if (error) {
-      console.log(error)
-    }
-
     setFormData({
-      category: selectedItem?.category?.id,
-      title: selectedItem?.title,
-      description: selectedItem?.description,
-      photo_url: selectedItem?.photo_url,
-      discount_percent: selectedItem?.discount_percent,
+      category: selectedItem?.category?.id || 1,
+      title: selectedItem?.title || '',
+      description: selectedItem?.description || '',
+      photo_url: selectedItem?.photo_url || '',
+      discount_percent: selectedItem?.discount_percent || 0,
       is_active: true
     })
-  }, [selectedItem, success, allProduct, error, refetch])
+  }, [selectedItem])
 
   // modal for data update
 
@@ -73,7 +74,8 @@ export default function Page() {
 
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'discount_percent' ? Number(value) : value
+      [name]:
+        name === 'discount_percent' ? (Number(value) || name === 'discount_percent' ? Number(value) : value) : value
     }))
   }
 
@@ -103,15 +105,25 @@ export default function Page() {
     setCreateProductModal(false)
   }
 
-  //category data create
-  const createCategorySubmit = e => {
+  //store product create==============================
+  const createHandel = e => {
     e.preventDefault()
-    console.log(createProductModal)
+    console.log(formData)
+    createProduct({ formData, token: userData.token })
   }
 
-  console.log(createProductModal)
+  useEffect(() => {
+    if (createSuccess) {
+      alert('Product is Created')
+      setCreateProductModal(false)
+      refetch()
+      setFormData({})
+    } else if (createError) {
+      alert(createError)
+    }
+  }, [createSuccess, createError, refetch])
 
-  // category data update handel
+  // store product update handel=========================
   const updateHandleSubmit = async e => {
     e.preventDefault()
     const token = userData.token
@@ -127,9 +139,20 @@ export default function Page() {
     }
   }
 
-  //single product delete handel
+  useEffect(() => {
+    if (success) {
+      alert('updated Successful')
+      setShowModal(false)
+      refetch()
+      setFormData({})
+    } else if (error) {
+      console.log(error)
+    }
+  }, [success, error, refetch])
+
+  //single product delete handel================================
   const productDeleteHandel = id => {
-    deleteProduct({ id: id, token: userData?.token })
+    deleteProduct({ id, token: userData?.token })
   }
 
   useEffect(() => {
@@ -196,6 +219,8 @@ export default function Page() {
                   </thead>
                   <tbody className='divide-y divide-gray-200 overflow-x-auto'>
                     {allProduct?.map(item => {
+                      console.log('item', item)
+
                       return (
                         <tr key={item.id}>
                           <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
@@ -206,6 +231,11 @@ export default function Page() {
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
                             {item?.category?.title}
                           </td>
+                          {item?.photo_url && (
+                            <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
+                              <Image src={item?.photo_url} alt='image' width={50} height={40} className='rounded ' />
+                            </td>
+                          )}
 
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
                             {item?.discount_percent}
@@ -280,7 +310,7 @@ export default function Page() {
               >
                 {productCategory.map(category => (
                   <option key={category.id} value={category.id}>
-                    {category.value}
+                    Id {category.id} / Name {category.value}
                   </option>
                 ))}
               </select>
@@ -363,7 +393,7 @@ export default function Page() {
             <h2 className='text-slate-800 text-center'>Create a product</h2>
           </div>
 
-          <form onSubmit={createCategorySubmit} className='max-w-xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+          <form onSubmit={createHandel} className='max-w-xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
               <label className='block text-white font-bold mb-2'>Product Category Id :</label>
               <select
@@ -374,7 +404,7 @@ export default function Page() {
               >
                 {productCategory.map(category => (
                   <option key={category.id} value={category.id}>
-                    {category.value}
+                    Category Id {category.id} / Name {category.value}
                   </option>
                 ))}
               </select>

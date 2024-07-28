@@ -37,9 +37,12 @@ const LoginV2 = () => {
   const [loginUser, { data, isLoading, isSuccess, isError, error }] = useLoginUserMutation()
 
   // login handel
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault()
-    loginUser({
+
+    console.log(email, password)
+
+    await loginUser({
       email: email,
       password: password
     })
@@ -48,7 +51,6 @@ const LoginV2 = () => {
   // console.log('isSuccess', isSuccess)
   // console.log('user', data)
   // console.log('isError', isError)
-  // console.log('error', error)
 
   useEffect(() => {
     if (isSuccess) {

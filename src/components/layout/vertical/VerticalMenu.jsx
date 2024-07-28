@@ -100,15 +100,14 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
         <MenuSection>
           <SubMenu label={'Diet'} icon={<i className='tabler-grill-off' />}>
             <MenuItem href={`/diet/list`}>Diet List</MenuItem>
-            <MenuItem href={`/diet/add`}>Add Diet</MenuItem>
-            <MenuItem href={`/diet/categorylist`}>Category Diet List</MenuItem>
+            <MenuItem href={`/diet/dietCategory`}>Diet Category</MenuItem>
           </SubMenu>
         </MenuSection>
         {/* Body Part menu */}
         <MenuSection>
           <SubMenu label={'Body Part'} icon={<i className='tabler-play-handball' />}>
             <MenuItem href={`/bodyPart/list`}>Body Part List</MenuItem>
-            <MenuItem href={`/bodyPart/add`}>Add Body Part</MenuItem>
+            <MenuItem href={`/bodyPart/category`}>Body Part Category</MenuItem>
           </SubMenu>
         </MenuSection>
         {/* Store menu */}

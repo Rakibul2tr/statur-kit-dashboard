@@ -3,13 +3,16 @@ import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
+import { useForm, useFieldArray } from 'react-hook-form'
+
 import Modal from '../../../components/Modal'
 
 import {
   useCreateProgramContentMutation,
-  useDeleteProgramMutation,
+  useDeleteProgramContentMutation,
   useProgramContentQuery,
-  useProgramDataGetQuery
+  useProgramDataGetQuery,
+  useUpdateProgramContentMutation
 } from '@/redux/api/apiSlice'
 
 const theadData = [
@@ -31,23 +34,24 @@ export default function Page() {
   const [createProgConteModal, setCreateProgConteModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState({})
 
-  const { data: programs } = useProgramDataGetQuery({ token: userData.token })
-  const { data: programsContent, isSuccess } = useProgramContentQuery({ token: userData.token })
+  const { data: programs } = useProgramDataGetQuery({ token: userData?.token ? userData.token : null })
 
-  const [updateProgramContent, { data, isSuccess: success, error }] = use()
+  const { data: programsContent, refetch } = useProgramContentQuery({ token: userData?.token ? userData.token : null })
+
+  const [updateProgramContent, { isSuccess: success, error }] = useUpdateProgramContentMutation()
 
   const [createProgramContent, { isSuccess: createSuccess, error: createError }] = useCreateProgramContentMutation()
-  const [deleteProgram, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteProgramMutation()
+  const [deleteProgramContent, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteProgramContentMutation()
 
   const [formData, setFormData] = useState({
-    program: selectedItem.id || 0,
+    program: parseInt(selectedItem?.program?.id || 0),
     title: selectedItem.title || '',
     description: selectedItem.description || '',
     photo_url: selectedItem.photo_url || '',
     features: [{ key: '', data: '' }]
   })
 
-  // console.log('programsContent', programsContent)
+  // console.log('selectedItem', selectedItem, 'formData', formData)
   useEffect(() => {
     const localData = async () => {
       const data = localStorage.getItem('user')
@@ -61,26 +65,14 @@ export default function Page() {
     }
 
     localData()
-
-    if (success) {
-      alert('updated Successful')
-      setShowModal(false)
-    } else if (error) {
-      console.log(error)
-    }
-
     setFormData({
-      program: selectedItem?.id || 0,
+      program: parseInt(selectedItem?.program?.id || 0),
       title: selectedItem?.title || '',
       description: selectedItem?.description || '',
       photo_url: selectedItem?.photo_url || '',
       features: [{ key: '', data: '' }]
     })
-  }, [selectedItem, error, success])
-
-  // modal for data update
-
-  // console.log('user', typeof selectedItem.id)
+  }, [selectedItem])
 
   const handleChange = e => {
     const { name, value } = e.target
@@ -91,31 +83,31 @@ export default function Page() {
     }))
   }
 
-  const handleFeatureChange = (index, e) => {
-    const { name, value } = e.target
-    const newFeatures = formData.features.map((feature, i) => (i === index ? { ...feature, [name]: value } : feature))
+  // const handleFeatureChange = (index, e) => {
+  //   const { name, value } = e.target
+  //   const newFeatures = formData.features.map((feature, i) => (i === index ? { ...feature, [name]: value } : feature))
 
-    setFormData(prev => ({
-      ...prev,
-      features: newFeatures
-    }))
-  }
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     features: newFeatures
+  //   }))
+  // }
 
-  const addFeature = () => {
-    setFormData(prev => ({
-      ...prev,
-      features: [...prev.features, { key: '', data: '' }]
-    }))
-  }
+  // const addFeature = () => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     features: [...prev.features, { key: '', data: '' }]
+  //   }))
+  // }
 
   //  modal open handel
 
-  const toggleModal = item => {
+  const openEditModal = item => {
     setSelectedItem(item)
     setUpdateModal(true)
   }
 
-  //  modal close handel
+  //  modal close handel=======================
 
   const closeModal = () => {
     setFormData({
@@ -125,18 +117,19 @@ export default function Page() {
       photo_url: '',
       features: [{ key: '', data: '' }]
     })
+    setSelectedItem({})
     setUpdateModal(false)
     setCreateProgConteModal(false)
   }
 
-  //  update program data handel
+  //  update program content data handel==========================
   const token = userData.token
 
   const updateHandleSubmit = async e => {
     e.preventDefault()
 
     try {
-      await updateProgramData({
+      await updateProgramContent({
         token: token,
         formData: formData,
         id: selectedItem.id
@@ -146,56 +139,77 @@ export default function Page() {
     }
   }
 
-  // create data for program handel
-
-  const createHandleSubmit = e => {
-    e.preventDefault()
-    console.log('form data', formData)
-
-    let sendFormData = {
-      title: formData.title,
-      description: formData.description,
-      photo_url: formData.photo_url,
-      program: formData.program,
-      features: formData.features
+  useEffect(() => {
+    if (success) {
+      alert('updated Successful')
+      setUpdateModal(false)
+      refetch()
+    } else if (error) {
+      console.log(error)
     }
+  }, [success, error, refetch])
 
-    // createProgramContent({ sendFormData, token })
+  //  update program content data handel end ==========================
+
+  // create program content data handel with react hook form============
+  const { register, handleSubmit, control, watch } = useForm({
+    defaultValues: {
+      features: [{ key: '', data: '' }],
+      is_active: false
+    }
+  })
+
+  const { fields, append } = useFieldArray({
+    control,
+    name: 'features'
+  })
+
+  const onSubmit = data => {
+    console.log(data)
+
+    createProgramContent({ data, token: userData.token })
   }
 
   useEffect(() => {
     if (createSuccess) {
       alert('Created successful')
+      setCreateProgConteModal(false)
+      refetch()
     } else if (createError) {
       console.log('create program error', createError)
     }
-  }, [createSuccess, createError])
+  }, [createSuccess, createError, refetch])
 
-  // delete a program handel
-  const programDeleteHandel = id => {
-    deleteProgram({ id: id, token: userData?.token })
+  // create program content data handel end ============
+
+  // delete a program handel=============================
+  const deleteHandel = id => {
+    deleteProgramContent({ id: id, token: userData?.token })
   }
 
   useEffect(() => {
     if (deleteSuccess) {
       alert('Program is Deleted')
+      refetch()
     } else if (deleteError) {
       // alert(deleteError)
       console.log('error', deleteError)
     }
-  }, [deleteSuccess, deleteError])
+  }, [deleteSuccess, deleteError, refetch])
+
+  // delete a program handel end ===========================
 
   return (
     <div className=' p-2 '>
       {/* main title  */}
       <div className=' '>
         <div className='  bg-slate-900 flex flex-row items-center justify-between shadow-md shadow-red-400 py-3 px-3 rounded-t-md'>
-          <h1 className='text-slate-300 text-2xl '>Programs List</h1>
+          <h1 className='text-slate-300 text-2xl '>Program Content List</h1>
           <button
             onClick={() => setCreateProgConteModal(true)}
             className='p-3 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 cursor-pointer'
           >
-            Add Program
+            Add Program Content
           </button>
         </div>
         {/* search box */}
@@ -269,15 +283,12 @@ export default function Page() {
                             <td className=' text-sm font-medium text-right whitespace-nowrap'>
                               <div className='flex justify-between mr-2'>
                                 <div className='bg-[#ffff00] px-2 py-1 rounded-md '>
-                                  <button className='bg-[#ffff00] cursor-pointer' onClick={() => toggleModal(item)}>
+                                  <button className='bg-[#ffff00] cursor-pointer' onClick={() => openEditModal(item)}>
                                     <i className='tabler-edit'></i>
                                   </button>
                                 </div>
                                 <div className='bg-[#ffff00] px-2 py-1 rounded-md'>
-                                  <button
-                                    className='bg-[#ffff00] cursor-pointer'
-                                    onClick={() => programDeleteHandel(item.id)}
-                                  >
+                                  <button className='bg-[#ffff00] cursor-pointer' onClick={() => deleteHandel(item.id)}>
                                     <i className='tabler-trash text-red-600'></i>
                                   </button>
                                 </div>
@@ -324,8 +335,8 @@ export default function Page() {
                 <label className='block text-white font-bold mb-2'>Program Number :</label>
                 <input
                   type='number'
-                  name='id'
-                  defaultValue={formData?.id}
+                  name='program'
+                  defaultValue={formData?.program}
                   onChange={handleChange}
                   className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                 />
@@ -398,99 +409,93 @@ export default function Page() {
                 <h2 className='text-slate-800 text-center'>Create a Program Content</h2>
               </div>
               <div className='h-96 overflow-y-auto p-4 bg-slate-900 shadow-md rounded-lg'>
-                <form onSubmit={createHandleSubmit}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Program Name:</label>
                     <select
-                      name='program'
-                      value={formData?.program}
-                      onChange={handleChange}
+                      {...register('program')}
                       className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     >
                       {programs?.map((i, index) => (
-                        <option value={i?.id} key={index}>
-                          {i?.title}
+                        <option value={i.id} key={index}>
+                          {i.title}
                         </option>
                       ))}
                     </select>
                   </div>
+
                   <div className='mb-4'>
-                    <label className='block text-white font-bold mb-2'>Program Title:</label>
+                    <label className='block text-white font-bold mb-2'>Program content Title:</label>
                     <input
                       type='text'
-                      name='title'
-                      defaultValue={formData?.title}
-                      onChange={handleChange}
+                      {...register('title')}
                       className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
                   </div>
+
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Description:</label>
                     <textarea
-                      name='description'
-                      defaultValue={formData?.description}
-                      onChange={handleChange}
+                      {...register('description')}
                       className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
                   </div>
+
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Photo URL:</label>
                     <input
                       type='text'
-                      name='photo_url'
-                      defaultValue={formData?.photo_url}
-                      onChange={handleChange}
+                      {...register('photo_url')}
                       className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
                   </div>
+
                   <fieldset className='mb-4'>
                     <legend className='text-lg font-bold text-white'>Features</legend>
-                    {formData?.features?.map((feature, index) => (
-                      <div key={index} className='mb-4'>
+                    {fields.map((feature, index) => (
+                      <div key={feature.id} className='mb-4'>
                         <label className='block text-white text-sm font-bold mb-2' htmlFor={`feature-key-${index}`}>
                           Key
                         </label>
                         <select
+                          {...register(`features.${index}.key`)}
                           className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
                           id={`feature-key-${index}`}
-                          name='key'
-                          value={feature.key}
-                          onChange={e => handleFeatureChange(index, e)}
                         >
                           <option value='text'>Text</option>
                           <option value='image'>Image</option>
-                          <option value='video'>video</option>
-                          {/* Add more options as needed */}
+                          <option value='video'>Video</option>
                         </select>
-                        {/* <input
-                          className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
-                          id={`feature-key-${index}`}
-                          name='key'
-                          type='text'
-                          value={feature.key}
-                          onChange={e => handleFeatureChange(index, e)}
-                        /> */}
+
                         <label className='block text-white text-sm font-bold mb-2' htmlFor={`feature-data-${index}`}>
-                          value
+                          Value
                         </label>
                         <input
-                          className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3  leading-tight focus:outline-none focus:shadow-outline'
+                          {...register(`features.${index}.data`)}
+                          className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
                           id={`feature-data-${index}`}
-                          name='data'
                           type='text'
-                          value={feature.data}
-                          onChange={e => handleFeatureChange(index, e)}
                         />
                       </div>
                     ))}
                     <button
                       type='button'
                       className='bg-slate-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-                      onClick={addFeature}
+                      onClick={() => append({ key: '', data: '' })}
                     >
                       Add Feature
                     </button>
                   </fieldset>
+
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Active:</label>
+                    <div className='flex items-center'>
+                      <input type='checkbox' {...register('is_active')} className='toggle-checkbox ' id='is_active' />
+                      <label htmlFor='is_active' className='ml-2 text-white'>
+                        {watch('is_active') ? 'Active' : 'Inactive'}
+                      </label>
+                    </div>
+                  </div>
                   <button
                     type='submit'
                     className='w-full px-4 cursor-pointer py-2 bg-yellow-500 text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
@@ -500,118 +505,11 @@ export default function Page() {
                 </form>
               </div>
             </div>
-            {/* <button
-              onClick={() => closeModal()}
-              className='cursor-pointer absolute   rounded-lg right-52  m-2 bg-[#ffff00] p-2'
-            >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                className='icon icon-tabler icons-tabler-outline icon-tabler-x'
-              >
-                <path stroke='none' d='M0 0h24v24H0z' fill='none' />
-                <path d='M18 6l-12 12' />
-                <path d='M6 6l12 12' />
-              </svg>
-            </button>
-            <div className='pb-3'>
-              <h2 className='text-slate-800 text-center'>Create a Program Content</h2>
-            </div>
-            <form onSubmit={createHandleSubmit} className=' p-4 bg-slate-900 shadow-md rounded-lg'>
-              <div className='mb-4'>
-                <label className='block text-white font-bold mb-2'>Program Id : </label>
-                <input
-                  type='number'
-                  name='program'
-                  defaultValue={formData?.program}
-                  onChange={handleChange}
-                  className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block text-white font-bold mb-2'>Program Title:</label>
-                <input
-                  type='text'
-                  name='title'
-                  defaultValue={formData?.title}
-                  onChange={handleChange}
-                  className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block text-white font-bold mb-2'>Description:</label>
-                <textarea
-                  name='description'
-                  defaultValue={formData?.description}
-                  onChange={handleChange}
-                  className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                />
-              </div>
-
-              <div className='mb-4'>
-                <label className='block text-white font-bold mb-2'>Photo URL:</label>
-                <input
-                  type='text'
-                  name='photo_url'
-                  defaultValue={formData?.photo_url}
-                  onChange={handleChange}
-                  className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                />
-              </div>
-              <fieldset className='mb-4'>
-                <legend className='text-lg font-bold text-gray-700'>Features</legend>
-                {formData?.features?.map((feature, index) => (
-                  <div key={index} className='mb-4'>
-                    <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor={`feature-key-${index}`}>
-                      Feature Key
-                    </label>
-                    <input
-                      className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                      id={`feature-key-${index}`}
-                      name='key'
-                      type='text'
-                      value={feature.key}
-                      onChange={e => handleFeatureChange(index, e)}
-                    />
-                    <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor={`feature-data-${index}`}>
-                      Feature Data
-                    </label>
-                    <input
-                      className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                      id={`feature-data-${index}`}
-                      name='data'
-                      type='text'
-                      value={feature.data}
-                      onChange={e => handleFeatureChange(index, e)}
-                    />
-                  </div>
-                ))}
-                <button
-                  type='button'
-                  className='bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-                  onClick={addFeature}
-                >
-                  Add Feature
-                </button>
-              </fieldset>
-
-              <button
-                type='submit'
-                className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
-              >
-                Create
-              </button>
-            </form> */}
           </Modal>
         ) : null}
       </div>
     </div>
   )
 }
+
+

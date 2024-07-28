@@ -27,7 +27,12 @@ export default function Page() {
   const [createCategoryModal, setCreateCategoryModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState({})
 
-  const { data: allCategory, isSuccess, error } = useProductCategoryQuery(userData ? { token: userData?.token } : null)
+  const {
+    data: allCategory,
+    isSuccess,
+    error,
+    refetch
+  } = useProductCategoryQuery({ token: userData?.token ? userData?.token : null })
 
   const [updateProductCategory, { isSuccess: success, error: updateError }] = useUpdateProductCategoryMutation()
   const [createProductCategory, { isSuccess: createSuccess, error: CreateError }] = useCreateProductCategoryMutation()
@@ -55,23 +60,17 @@ export default function Page() {
 
   // modal for data update
   useEffect(() => {
-    setUpdateData({
+    setFormData({
       category: selectedItem?.id || null,
       title: selectedItem?.title || '',
       description: selectedItem?.description || '',
       photo_url: selectedItem?.photo_url || ''
     })
-
-    if (success) {
-      alert('updated successful')
-    } else if (updateError) {
-      alert(updateError)
-    }
-  }, [selectedItem, success, updateError])
+  }, [selectedItem])
 
   //   formData is her
 
-  const [updateData, setUpdateData] = useState({
+  const [formData, setFormData] = useState({
     category: selectedItem?.id || null,
     title: selectedItem?.title || '',
     description: selectedItem?.description || '',
@@ -81,7 +80,7 @@ export default function Page() {
   const handleChange = e => {
     const { name, value } = e.target
 
-    setUpdateData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }))
@@ -97,7 +96,7 @@ export default function Page() {
   //  modal close handel
 
   const closeModal = () => {
-    setUpdateData({
+    setFormData({
       category: null,
       title: '',
       description: '',
@@ -107,50 +106,66 @@ export default function Page() {
     setCreateCategoryModal(false)
   }
 
+
+
+  // category data update handel============================
+
   const id = selectedItem.id
   const token = userData.token
 
-  // category data update handel
   const updateHandleSubmit = async e => {
     e.preventDefault()
-    console.log('category', updateData, token, id)
-    await updateProductCategory({ token, updateData, id }).unwrap()
+    await updateProductCategory({ token, formData, id }).unwrap()
   }
 
-  // create a product category
+  useEffect(() => {
+    if (success) {
+      alert('updated successful')
+      setShowModal(false)
+      refetch()
+    } else if (updateError) {
+      alert(updateError)
+    }
+  }, [success, updateError, refetch])
+
+  // create a product category============================
 
   const categoryCreateHandel = e => {
     e.preventDefault()
-    let categoryData = {
-      title: updateData.title,
-      description: updateData.description,
-      photo_url: updateData.photo_url
+
+    let object = {
+      title: formData.title,
+      description: formData.description,
+      photo_url: formData.photo_url
     }
 
-    createProductCategory({ token, categoryData })
+    createProductCategory({ token, formData: object })
   }
 
   useEffect(() => {
     if (createSuccess) {
       alert('Category Created successful')
+      setCreateCategoryModal(false)
+      refetch()
     } else if (CreateError) {
       alert('Created field!')
     }
-  }, [createSuccess, CreateError])
+  }, [createSuccess, CreateError, refetch])
 
-  //category delete handel
+  //category delete handel===================================
   const categoryDeleteHandel = id => {
-    deleteCategory({ id: id, token: userData?.token })
+    deleteCategory({ id, token: userData?.token })
   }
 
   useEffect(() => {
     if (deleteSuccess) {
       alert('Product is Deleted')
+      refetch()
     } else if (deleteError) {
       // alert(deleteError)
       console.log('error', deleteError)
     }
-  }, [deleteSuccess, deleteError])
+  }, [deleteSuccess, deleteError, refetch])
 
   return (
     <div className=' p-2'>
@@ -284,7 +299,7 @@ export default function Page() {
               <input
                 type='number'
                 name='category'
-                defaultValue={updateData?.category}
+                defaultValue={formData?.category}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -294,7 +309,7 @@ export default function Page() {
               <input
                 type='text'
                 name='title'
-                defaultValue={updateData?.title}
+                defaultValue={formData?.title}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -303,7 +318,7 @@ export default function Page() {
               <label className='block text-white font-bold mb-2'>Description:</label>
               <textarea
                 name='description'
-                defaultValue={updateData?.description}
+                defaultValue={formData?.description}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -314,7 +329,7 @@ export default function Page() {
               <input
                 type='text'
                 name='photo_url'
-                defaultValue={updateData?.photo_url}
+                defaultValue={formData?.photo_url}
                 onChange={handleChange}
                 className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -361,7 +376,7 @@ export default function Page() {
               <input
                 type='text'
                 name='title'
-                defaultValue={updateData?.title}
+                defaultValue={formData?.title}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -370,7 +385,7 @@ export default function Page() {
               <label className='block text-white font-bold mb-2'>Description:</label>
               <textarea
                 name='description'
-                defaultValue={updateData?.description}
+                defaultValue={formData?.description}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
@@ -381,7 +396,7 @@ export default function Page() {
               <input
                 type='text'
                 name='photo_url'
-                defaultValue={updateData?.photo_url}
+                defaultValue={formData?.photo_url}
                 onChange={handleChange}
                 className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />

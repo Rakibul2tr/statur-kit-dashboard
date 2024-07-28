@@ -9,7 +9,7 @@ import '@assets/iconify-icons/generated-icons.css'
 import Providers from '../lib/Provider'
 
 export const metadata = {
-  title: 'fike fit'
+  title: 'Fike-fit'
 }
 
 const RootLayout = ({ children }) => {

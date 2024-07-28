@@ -6,6 +6,7 @@ import classnames from 'classnames'
 // Component Imports
 import NavToggle from './NavToggle'
 import ModeDropdown from '@components/layout/shared/ModeDropdown'
+import FileStorage from '@components/layout/shared/FileStorage'
 import UserDropdown from '@components/layout/shared/UserDropdown'
 
 // Util Imports
@@ -18,6 +19,7 @@ const NavbarContent = () => {
         <NavToggle />
         <ModeDropdown />
       </div>
+      <div>{/* <FileStorage /> */}</div>
       <div className='flex items-center'>
         <UserDropdown />
       </div>

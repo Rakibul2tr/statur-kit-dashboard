@@ -5,7 +5,7 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://stage-api.fikefit.com'
   }),
-  tagTypes: ['UserList'],
+
   endpoints: builder => ({
     //****************************** suer authentication start ********************* */
     //========= user Register api============
@@ -19,10 +19,10 @@ export const apiSlice = createApi({
 
     //=============User login api==============
     loginUser: builder.mutation({
-      query: data => ({
+      query: ({ email, password }) => ({
         url: '/api/users/login/',
         method: 'POST',
-        body: { email: data.email, password: data.password }
+        body: { email: email, password: password }
       })
     }),
 
@@ -146,27 +146,27 @@ export const apiSlice = createApi({
     //===============create Product category api==============Done
 
     createProductCategory: builder.mutation({
-      query: ({ token, categoryData }) => ({
+      query: ({ token, formData }) => ({
         url: `/api/product-categories/`,
         method: 'POST',
         headers: {
           authorization: `token ${token}`
         },
-        body: categoryData
+        body: formData
       })
     }),
 
     //===============update Product category api==============
 
     updateProductCategory: builder.mutation({
-      query: ({ token, updateData, id }) => ({
+      query: ({ token, formData, id }) => ({
         url: `/api/product-categories/${id}/`,
         method: 'PATCH',
         headers: {
           authorization: `token ${token}`,
           'Content-Type': 'application/json'
         },
-        body: updateData
+        body: formData
       })
     }),
 
@@ -258,13 +258,13 @@ export const apiSlice = createApi({
     //==============create program content api===============
 
     createProgramContent: builder.mutation({
-      query: data => ({
+      query: ({ data, token }) => ({
         url: `/api/program-contents/`,
         method: 'POST',
         headers: {
-          authorization: `token ${data?.token}`
+          authorization: `token ${token}`
         },
-        body: data.formData
+        body: data
       })
     }),
 
@@ -272,7 +272,7 @@ export const apiSlice = createApi({
 
     updateProgramContent: builder.mutation({
       query: data => ({
-        url: `/api/program-contents/${data.id}`,
+        url: `/api/program-contents/${data.id}/`,
         method: 'PATCH',
         headers: {
           authorization: `token ${data?.token}`
@@ -291,9 +291,268 @@ export const apiSlice = createApi({
           authorization: `token ${token}`
         }
       })
+    }),
+
+    //************************** program particular content api start ************************** */
+    //==============Get program particular content api===============
+
+    programParticular: builder.query({
+      query: data => ({
+        url: `/api/content-particulars/`,
+        method: 'GET',
+        headers: {
+          authorization: `token ${data?.token}`
+        }
+      })
+    }),
+
+    //==============create program particular content api===============
+
+    createProgramParticular: builder.mutation({
+      query: ({ data, token }) => ({
+        url: `/api/content-particulars/`,
+        method: 'POST',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: data
+      })
+    }),
+
+    //==============update program particular content api===============
+
+    updateProgramParticular: builder.mutation({
+      query: data => ({
+        url: `/api/program-contents/${data.id}`,
+        method: 'PATCH',
+        headers: {
+          authorization: `token ${data?.token}`
+        },
+        body: data.formData
+      })
+    }),
+
+    //===============delete a program particular content  api==============
+
+    deleteProgramParticular: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/content-particulars/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //*********************** diet screens api start **************** */
+
+    //==============Get all Diet Category api===============
+
+    allDietCategory: builder.query({
+      query: ({ token }) => ({
+        url: `/api/products/`,
+        method: 'GET',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //===============Create a Diet Category  api==============
+
+    createDietCategory: builder.mutation({
+      query: ({ token, formData }) => ({
+        url: '/api/products/',
+        method: 'POST',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: formData
+      })
+    }),
+
+    //===============update a Diet Category api==============
+
+    updateDietCategory: builder.mutation({
+      query: ({ token, formData, id }) => ({
+        url: `/api/products/${id}/`,
+        method: 'PATCH',
+        headers: {
+          authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+    }),
+
+    //===============delete a Diet Category api==============
+
+    deleteDietCategory: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/products/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //==============Get all Diet api===============
+
+    allDietList: builder.query({
+      query: ({ token }) => ({
+        url: `/api/products/`,
+        method: 'GET',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //===============Create a Diet  api==============
+
+    createDiet: builder.mutation({
+      query: ({ token, formData }) => ({
+        url: '/api/products/',
+        method: 'POST',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: formData
+      })
+    }),
+
+    //===============update a Diet api==============
+
+    updateDiet: builder.mutation({
+      query: ({ token, formData, id }) => ({
+        url: `/api/products/${id}/`,
+        method: 'PATCH',
+        headers: {
+          authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+    }),
+
+    //===============delete a Diet api==============
+
+    deleteDiet: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/products/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //*********************** body part screens api start **************** */
+
+    //==============Get all body part Category api===============
+
+    allBodyPartCategory: builder.query({
+      query: ({ token }) => ({
+        url: `/api/products/`,
+        method: 'GET',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //===============Create a body part Category  api==============
+
+    createBodyPartCategory: builder.mutation({
+      query: ({ token, formData }) => ({
+        url: '/api/products/',
+        method: 'POST',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: formData
+      })
+    }),
+
+    //===============update a body part Category api==============
+
+    updateBodyPartCategory: builder.mutation({
+      query: ({ token, formData, id }) => ({
+        url: `/api/products/${id}/`,
+        method: 'PATCH',
+        headers: {
+          authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+    }),
+
+    //===============delete a body part Category api==============
+
+    deleteBodyPartCategory: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/products/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //==============Get all body part api===============
+
+    allBodyPartList: builder.query({
+      query: ({ token }) => ({
+        url: `/api/products/`,
+        method: 'GET',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //===============Create a body part  api==============
+
+    createBodyPart: builder.mutation({
+      query: ({ token, formData }) => ({
+        url: '/api/products/',
+        method: 'POST',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: formData
+      })
+    }),
+
+    //===============update a body part api==============
+
+    updateBodyPart: builder.mutation({
+      query: ({ token, formData, id }) => ({
+        url: `/api/products/${id}/`,
+        method: 'PATCH',
+        headers: {
+          authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+    }),
+
+    //===============delete a body part api==============
+
+    deleteBodyPart: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/products/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
     })
 
-    //============== program content Get api===============
+    //===============get Product category api==============Done
   })
 })
 
@@ -326,15 +585,39 @@ export const {
   useUpdateProgramContentMutation,
   useDeleteProgramContentMutation,
 
-  //========= product Api start==========
+  //program particular content api
+  useProgramParticularQuery,
+  useCreateProgramParticularMutation,
+  useUpdateProgramParticularMutation,
+  useDeleteProgramParticularMutation,
+
+  //========= store screen Api ==========
   useCreateProductMutation,
   useUpdateProductMutation,
   useAllProductQuery,
   useDeleteProductMutation,
-
-  //============ product category api=====
   useCreateProductCategoryMutation,
   useUpdateProductCategoryMutation,
   useProductCategoryQuery,
-  useDeleteCategoryMutation
+  useDeleteCategoryMutation,
+
+  //================= diet screen api =======
+  useAllDietCategoryQuery,
+  useCreateDietCategoryMutation,
+  useUpdateDietCategoryMutation,
+  useDeleteDietCategoryMutation,
+  useAllDietListQuery,
+  useCreateDietMutation,
+  useUpdateDietMutation,
+  useDeleteDietMutation,
+
+  //================= body part screen api
+  useAllBodyPartCategoryQuery,
+  useCreateBodyPartCategoryMutation,
+  useUpdateBodyPartCategoryMutation,
+  useDeleteBodyPartCategoryMutation,
+  useAllBodyPartListQuery,
+  useCreateBodyPartMutation,
+  useUpdateBodyPartMutation,
+  useDeleteBodyPartMutation
 } = apiSlice
