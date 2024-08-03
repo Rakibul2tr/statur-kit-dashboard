@@ -74,28 +74,28 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
           </SubMenu>
         </MenuSection>
         {/* equipment menu */}
-        <MenuSection>
+        {/* <MenuSection>
           <SubMenu label={'Equipment'} icon={<i className='tabler-barbell' />}>
             <MenuItem href={`/equipment/list`}>Equipment List</MenuItem>
             <MenuItem href={`/equipment/add`}>Add Equipment</MenuItem>
           </SubMenu>
-        </MenuSection>
+        </MenuSection> */}
         {/* Exercise menu */}
-        <MenuSection>
+        {/* <MenuSection>
           <SubMenu label={'Exercise'} icon={<i className='tabler-woman' />}>
             <MenuItem href={`/exercise/list`}>Exercise List</MenuItem>
             <MenuItem href={`/exercise/add`}>Add Exercise</MenuItem>
           </SubMenu>
-        </MenuSection>
+        </MenuSection> */}
 
         {/* Workout menu */}
-        <MenuSection>
+        {/* <MenuSection>
           <SubMenu label={'Workout'} icon={<i className='tabler-stretching' />}>
             <MenuItem href={`/workout/list`}>Workout List</MenuItem>
             <MenuItem href={`/workout/add`}>Add Workout</MenuItem>
             <MenuItem href={`/workout/typelist`}>Workout Type List</MenuItem>
           </SubMenu>
-        </MenuSection>
+        </MenuSection> */}
         {/* Diet menu */}
         <MenuSection>
           <SubMenu label={'Diet'} icon={<i className='tabler-grill-off' />}>
@@ -106,8 +106,8 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
         {/* Body Part menu */}
         <MenuSection>
           <SubMenu label={'Body Part'} icon={<i className='tabler-play-handball' />}>
-            <MenuItem href={`/bodyPart/list`}>Body Part List</MenuItem>
             <MenuItem href={`/bodyPart/category`}>Body Part Category</MenuItem>
+            <MenuItem href={`/bodyPart/categorycontent`}>Body Part category content</MenuItem>
           </SubMenu>
         </MenuSection>
         {/* Store menu */}
@@ -115,9 +115,8 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
         <MenuSection>
           <SubMenu label={'Stores'} icon={<i className='tabler-shopping-cart' />}>
             <MenuItem href={`/stores/list`}>Store List</MenuItem>
-            {/* <MenuItem href={`/stores/add`}>Add new Store</MenuItem> */}
+
             <MenuItem href={`/stores/categorylist`}>Store Category List</MenuItem>
-            {/* <MenuItem href={`/stores/addCategory`}>Add Store Category</MenuItem> */}
           </SubMenu>
         </MenuSection>
         {/* program item */}
@@ -132,7 +131,6 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
         <MenuSection>
           <SubMenu label={'Influencer'} icon={<i className='tabler-users' />}>
             <MenuItem href={`/influencer/list`}>Influencer List</MenuItem>
-            <MenuItem href={`/influencer/add`}>add new influencer</MenuItem>
           </SubMenu>
         </MenuSection>
         {/* Subscription menu */}

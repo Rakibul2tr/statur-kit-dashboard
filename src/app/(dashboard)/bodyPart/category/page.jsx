@@ -1,6 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
+import Image from 'next/image'
+
 import {
   useAllBodyPartCategoryQuery,
   useCreateBodyPartCategoryMutation,
@@ -11,11 +13,10 @@ import Modal from '../../../components/Modal'
 
 const theadData = [
   {
-    diet_Id: 'Product Id',
+    id: 'Product Id',
     title: 'title',
-    category_id: 'category Id',
-    category_title: 'category Title',
-    discount: 'Discount Percent',
+    description: 'description',
+    image: 'image',
     action: 'Action'
   }
 ]
@@ -23,8 +24,6 @@ const theadData = [
 export default function Page() {
   const [userData, setUserData] = useState({})
   const [showModal, setShowModal] = useState(false)
-
-  // const [refresh, setRefresh] = useState(false)
   const [createModal, setCreateModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState({})
 
@@ -43,12 +42,10 @@ export default function Page() {
   const [deleteBodyPartCategory, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteBodyPartCategoryMutation()
 
   const [formData, setFormData] = useState({
-    category: selectedItem.category || 1,
-    title: selectedItem.title || '',
-    description: selectedItem.description || '',
-    photo_url: selectedItem.photo_url || '',
-    discount_percent: selectedItem.discount_percent || 0,
-    is_active: true
+    title: selectedItem?.title || '',
+    description: selectedItem?.description || '',
+    photo_url: selectedItem?.photo_url || '',
+    is_active: selectedItem.is_active || true
   })
 
   useEffect(() => {
@@ -65,12 +62,10 @@ export default function Page() {
 
     localData()
     setFormData({
-      category: selectedItem?.category?.id,
-      title: selectedItem?.title,
-      description: selectedItem?.description,
-      photo_url: selectedItem?.photo_url,
-      discount_percent: selectedItem?.discount_percent,
-      is_active: true
+      title: selectedItem?.title || '',
+      description: selectedItem?.description || '',
+      photo_url: selectedItem?.photo_url || '',
+      is_active: selectedItem.is_active || true
     })
   }, [selectedItem, categoryList, refetch])
 
@@ -81,52 +76,41 @@ export default function Page() {
 
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'discount_percent' ? Number(value) : value
+      [name]: value
     }))
   }
 
   //  modal open handel
-
-  const toggleModal = (item, key) => {
-    if (key == 'update') {
-      setSelectedItem(item)
-      setShowModal(true)
-    } else {
-      setCreateModal(true)
-    }
+  const toggleModal = item => {
+    setSelectedItem(item)
+    setShowModal(true)
   }
 
   //  modal close handel
 
   const closeModal = () => {
-    setFormData({
-      category: null,
-      title: '',
-      description: '',
-      photo_url: '',
-      discount_percent: null,
-      is_active: true
-    })
+    setFormData({})
     setShowModal(false)
     setCreateModal(false)
   }
 
-  // create diet Category ======================================
+  // =======================create body part Category ===================
   const createHandel = e => {
     e.preventDefault()
-    console.log('create handel')
+    createBodyPartCategory({ formData, token: userData.token })
   }
 
   useEffect(() => {
     if (createSuccess) {
       alert('Create Successful')
       setCreateModal(false)
+      refetch()
     } else if (createError) {
       console.log(createError)
     }
-  }, [createSuccess, createError])
+  }, [createSuccess, createError, refetch])
 
-  // diet update handel=================================
+  //========================== body part category update handel=====================
   const updateHandleSubmit = async e => {
     e.preventDefault()
     const token = userData.token
@@ -134,7 +118,7 @@ export default function Page() {
     try {
       await updateBodyPartCategory({
         token: token,
-        formData: formData,
+        formData,
         id: selectedItem.id
       })
     } catch (error) {
@@ -144,21 +128,22 @@ export default function Page() {
 
   useEffect(() => {
     if (updateSuccess) {
-      alert('Create Successful')
+      alert('Update Successful')
       setShowModal(false)
+      refetch()
     } else if (updateError) {
       console.log(updateError)
     }
-  }, [updateSuccess, updateError])
+  }, [updateSuccess, updateError, refetch])
 
-  //single diet delete handel============================
+  //=====================body part category delete handel===================
   const DeleteHandel = id => {
     deleteBodyPartCategory({ id: id, token: userData?.token })
   }
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Diet Item is Deleted')
+      alert('Category is deleted')
       refetch()
     } else if (deleteError) {
       alert(deleteError)
@@ -172,7 +157,7 @@ export default function Page() {
         <h1 className='text-slate-300 text-2xl '>Body Part Category List</h1>
         <button
           className='p-3 rounded-lg bg-yellow-400 text-white hover:bg-yellow-500 cursor-pointer'
-          onClick={() => toggleModal()}
+          onClick={() => setCreateModal(true)}
         >
           Add Category
         </button>
@@ -224,24 +209,16 @@ export default function Page() {
                         <tr key={item.id}>
                           <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
-
-                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item?.category?.id}</td>
-
-                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                            {item?.category?.title}
+                          <td className='px-6 max-w-48 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis'>
+                            {item.description}
                           </td>
-
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                            {item?.discount_percent}
+                            <Image src={item?.photo_url} alt='' width={50} height={40} className='rounded' />
                           </td>
-
                           <td className=' text-sm font-medium text-right whitespace-nowrap'>
                             <div className='flex justify-between mr-2'>
                               <div className='bg-[#ffff00] px-2 py-1 rounded-md '>
-                                <button
-                                  className='bg-[#ffff00] cursor-pointer'
-                                  onClick={() => toggleModal(item, 'update')}
-                                >
+                                <button className='bg-[#ffff00] cursor-pointer' onClick={() => toggleModal(item)}>
                                   <i className='tabler-edit'></i>
                                 </button>
                               </div>
@@ -262,7 +239,7 @@ export default function Page() {
           </div>
         </div>
       </div>
-      {/* diet update  */}
+      {/* update  */}
       {showModal ? (
         <Modal>
           <button
@@ -291,23 +268,7 @@ export default function Page() {
           </div>
           <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Body part category</label>
-
-              <select
-                name='category'
-                value={formData.category}
-                onChange={handleChange}
-                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              >
-                {productCategory.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Title:</label>
+              <label className='block text-white font-bold mb-2'>Title:</label>
               <input
                 type='text'
                 name='title'
@@ -336,15 +297,14 @@ export default function Page() {
                 className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
             </div>
-
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>discount Percentage:</label>
+              <label className='block text-white font-bold mb-2'>Active:</label>
               <input
-                type='number'
-                name='discount_percent'
-                defaultValue={formData?.discount_percent}
-                onChange={handleChange}
-                className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                type='checkbox'
+                name='is_active'
+                checked={formData.is_active}
+                onChange={e => setFormData(prevState => ({ ...prevState, is_active: e.target.checked }))}
+                className='toggle-checkbox'
               />
             </div>
             <button
@@ -356,7 +316,7 @@ export default function Page() {
           </form>
         </Modal>
       ) : null}
-      {/* diet create */}
+      {/* create */}
       {createModal ? (
         <Modal>
           <button
@@ -386,22 +346,7 @@ export default function Page() {
 
           <form onSubmit={createHandel} className='max-w-xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Body part Category Id :</label>
-              <select
-                name='category'
-                value={formData.category}
-                onChange={handleChange}
-                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              >
-                {productCategory.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Diet Title:</label>
+              <label className='block text-white font-bold mb-2'>Title:</label>
               <input
                 type='text'
                 name='title'
@@ -430,7 +375,16 @@ export default function Page() {
                 className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
             </div>
-
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Active:</label>
+              <input
+                type='checkbox'
+                name='is_active'
+                checked={formData.is_active}
+                onChange={e => setFormData(prevState => ({ ...prevState, is_active: e.target.checked }))}
+                className='toggle-checkbox'
+              />
+            </div>
             <button
               type='submit'
               className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
@@ -444,13 +398,3 @@ export default function Page() {
   )
 }
 
-const productCategory = [
-  { id: 1, value: 'Diet' },
-  { id: 2, value: 'leg' },
-  { id: 3, value: 'body' },
-  { id: 4, value: 'hand' },
-  { id: 5, value: 'Category-5' },
-  { id: 6, value: 'Category-6' },
-  { id: 7, value: 'Category-7' },
-  { id: 8, value: 'Category-8' }
-]

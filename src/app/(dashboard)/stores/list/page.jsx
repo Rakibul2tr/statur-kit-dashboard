@@ -233,7 +233,9 @@ export default function Page() {
                           </td>
                           {item?.photo_url && (
                             <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                              <Image src={item?.photo_url} alt='image' width={50} height={40} className='rounded ' />
+                              {item.photo_url ? (
+                                <Image src={item?.photo_url} alt='image' width={50} height={40} className='rounded ' />
+                              ) : null}
                             </td>
                           )}
 

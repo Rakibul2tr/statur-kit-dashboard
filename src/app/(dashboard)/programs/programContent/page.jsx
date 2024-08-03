@@ -43,15 +43,7 @@ export default function Page() {
   const [createProgramContent, { isSuccess: createSuccess, error: createError }] = useCreateProgramContentMutation()
   const [deleteProgramContent, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteProgramContentMutation()
 
-  const [formData, setFormData] = useState({
-    program: parseInt(selectedItem?.program?.id || 0),
-    title: selectedItem.title || '',
-    description: selectedItem.description || '',
-    photo_url: selectedItem.photo_url || '',
-    features: [{ key: '', data: '' }]
-  })
-
-  // console.log('selectedItem', selectedItem, 'formData', formData)
+  // user info from local storage data
   useEffect(() => {
     const localData = async () => {
       const data = localStorage.getItem('user')
@@ -65,40 +57,7 @@ export default function Page() {
     }
 
     localData()
-    setFormData({
-      program: parseInt(selectedItem?.program?.id || 0),
-      title: selectedItem?.title || '',
-      description: selectedItem?.description || '',
-      photo_url: selectedItem?.photo_url || '',
-      features: [{ key: '', data: '' }]
-    })
-  }, [selectedItem])
-
-  const handleChange = e => {
-    const { name, value } = e.target
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: name == 'program' ? parseInt(value) : value
-    }))
-  }
-
-  // const handleFeatureChange = (index, e) => {
-  //   const { name, value } = e.target
-  //   const newFeatures = formData.features.map((feature, i) => (i === index ? { ...feature, [name]: value } : feature))
-
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     features: newFeatures
-  //   }))
-  // }
-
-  // const addFeature = () => {
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     features: [...prev.features, { key: '', data: '' }]
-  //   }))
-  // }
+  }, [])
 
   //  modal open handel
 
@@ -110,63 +69,34 @@ export default function Page() {
   //  modal close handel=======================
 
   const closeModal = () => {
-    setFormData({
-      program: 0,
-      title: '',
-      description: '',
-      photo_url: '',
-      features: [{ key: '', data: '' }]
-    })
     setSelectedItem({})
     setUpdateModal(false)
     setCreateProgConteModal(false)
   }
 
-  //  update program content data handel==========================
-  const token = userData.token
-
-  const updateHandleSubmit = async e => {
-    e.preventDefault()
-
-    try {
-      await updateProgramContent({
-        token: token,
-        formData: formData,
-        id: selectedItem.id
-      })
-    } catch (error) {
-      console.error('Error submitting form data:', error)
+  // create program content data handel with react hook form============
+  const { register, handleSubmit, watch, setValue } = useForm({
+    defaultValues: {
+      program: selectedItem?.program?.id || 0,
+      title: selectedItem?.title || '',
+      description: selectedItem?.description || '',
+      photo_url: selectedItem?.photo_url || '',
+      is_active: selectedItem?.is_active || false
     }
-  }
+  })
 
   useEffect(() => {
-    if (success) {
-      alert('updated Successful')
-      setUpdateModal(false)
-      refetch()
-    } else if (error) {
-      console.log(error)
+    // Set default values for the form fields
+    if (selectedItem) {
+      setValue('program', selectedItem?.program?.id)
+      setValue('title', selectedItem?.title)
+      setValue('description', selectedItem?.description)
+      setValue('photo_url', selectedItem?.photo_url)
+      setValue('is_active', selectedItem?.is_active)
     }
-  }, [success, error, refetch])
-
-  //  update program content data handel end ==========================
-
-  // create program content data handel with react hook form============
-  const { register, handleSubmit, control, watch } = useForm({
-    defaultValues: {
-      features: [{ key: '', data: '' }],
-      is_active: false
-    }
-  })
-
-  const { fields, append } = useFieldArray({
-    control,
-    name: 'features'
-  })
+  }, [selectedItem, setValue])
 
   const onSubmit = data => {
-    console.log(data)
-
     createProgramContent({ data, token: userData.token })
   }
 
@@ -180,7 +110,28 @@ export default function Page() {
     }
   }, [createSuccess, createError, refetch])
 
-  // create program content data handel end ============
+  //  update program content data handel==========================
+  const token = userData.token
+
+  const updateOnSubmit = data => {
+    console.log('update data', data)
+
+    updateProgramContent({
+      token: token,
+      formData: data,
+      id: selectedItem.id
+    })
+  }
+
+  useEffect(() => {
+    if (success) {
+      alert('updated Successful')
+      setUpdateModal(false)
+      refetch()
+    } else if (error) {
+      console.log(error)
+    }
+  }, [success, error, refetch])
 
   // delete a program handel=============================
   const deleteHandel = id => {
@@ -269,7 +220,9 @@ export default function Page() {
                               {item.program.title}
                             </td>
                             <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                              <Image src={item.program.photo_url} alt='' width={50} height={40} className='rounded' />
+                              {item.program.photo_url ? (
+                                <Image src={item.program.photo_url} alt='' width={50} height={40} className='rounded' />
+                              ) : null}
                             </td>
                             <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
 
@@ -278,7 +231,9 @@ export default function Page() {
                             </td>
 
                             <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                              <Image src={item.photo_url} alt='' width={50} height={40} className='rounded' />
+                              {item.photo_url ? (
+                                <Image src={item.photo_url} alt='' width={50} height={40} className='rounded' />
+                              ) : null}
                             </td>
                             <td className=' text-sm font-medium text-right whitespace-nowrap'>
                               <div className='flex justify-between mr-2'>
@@ -306,79 +261,150 @@ export default function Page() {
         </div>
         {updateModal ? (
           <Modal>
-            <button
-              onClick={() => closeModal()}
-              className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
-            >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='24'
-                height='24'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                className='icon icon-tabler icons-tabler-outline icon-tabler-x'
-              >
-                <path stroke='none' d='M0 0h24v24H0z' fill='none' />
-                <path d='M18 6l-12 12' />
-                <path d='M6 6l12 12' />
-              </svg>
-            </button>
-            <div className='pb-3'>
-              <h2 className='text-slate-800 text-center'>Update a Program</h2>
-            </div>
-            <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
-              <div className='mb-4'>
-                <label className='block text-white font-bold mb-2'>Program Number :</label>
-                <input
-                  type='number'
-                  name='program'
-                  defaultValue={formData?.program}
-                  onChange={handleChange}
-                  className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block text-white font-bold mb-2'>Program Title:</label>
-                <input
-                  type='text'
-                  name='title'
-                  defaultValue={formData?.title}
-                  onChange={handleChange}
-                  className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block text-white font-bold mb-2'>Description:</label>
-                <textarea
-                  name='description'
-                  defaultValue={formData?.description}
-                  onChange={handleChange}
-                  className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                />
-              </div>
-
-              <div className='mb-4'>
-                <label className='block text-white font-bold mb-2'>Photo URL:</label>
-                <input
-                  type='text'
-                  name='photo_url'
-                  defaultValue={formData?.photo_url}
-                  onChange={handleChange}
-                  className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                />
-              </div>
-
+            <div className='relative w-full max-w-2xl bg-white p-6 rounded-lg shadow-lg'>
               <button
-                type='submit'
-                className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
+                onClick={() => closeModal()}
+                className='cursor-pointer absolute top-2 right-2 rounded-lg bg-yellow-500 p-2'
               >
-                Update
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeWidth='2'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  className='icon icon-tabler icons-tabler-outline icon-tabler-x'
+                >
+                  <path stroke='none' d='M0 0h24v24H0z' fill='none' />
+                  <path d='M18 6l-12 12' />
+                  <path d='M6 6l12 12' />
+                </svg>
               </button>
-            </form>
+              <div className='pb-3'>
+                <h2 className='text-slate-800 text-center'>Update a Program content</h2>
+              </div>
+              <div className='h-96 overflow-y-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+                <form onSubmit={handleSubmit(updateOnSubmit)}>
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Program Name:</label>
+                    <select
+                      {...register('program')}
+                      defaultValue={selectedItem?.program?.id}
+                      className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    >
+                      {programs?.map((i, index) => (
+                        <option value={i.id} key={index}>
+                          {i.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Program content Title:</label>
+                    <input
+                      type='text'
+                      {...register('title')}
+                      defaultValue={selectedItem?.title}
+                      className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Description:</label>
+                    <textarea
+                      {...register('description')}
+                      defaultValue={selectedItem?.description}
+                      className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Photo URL:</label>
+                    <input
+                      type='text'
+                      {...register('photo_url')}
+                      defaultValue={selectedItem?.photo_url}
+                      className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Active:</label>
+                    <div className='flex items-center'>
+                      <input
+                        type='checkbox'
+                        {...register('is_active')}
+                        defaultValue={selectedItem?.is_active}
+                        className='toggle-checkbox '
+                        id='is_active'
+                      />
+                      <label htmlFor='is_active' className='ml-2 text-white'>
+                        {watch('is_active') ? 'Active' : 'Inactive'}
+                      </label>
+                    </div>
+                  </div>
+                  <button
+                    type='submit'
+                    className='w-full px-4 cursor-pointer py-2 bg-yellow-500 text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
+                  >
+                    Update Content
+                  </button>
+                </form>
+                {/* <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Program Number :</label>
+                    <input
+                      type='number'
+                      name='program'
+                      defaultValue={formData?.program}
+                      onChange={handleChange}
+                      className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Program Title:</label>
+                    <input
+                      type='text'
+                      name='title'
+                      defaultValue={formData?.title}
+                      onChange={handleChange}
+                      className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Description:</label>
+                    <textarea
+                      name='description'
+                      defaultValue={formData?.description}
+                      onChange={handleChange}
+                      className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Photo URL:</label>
+                    <input
+                      type='text'
+                      name='photo_url'
+                      defaultValue={formData?.photo_url}
+                      onChange={handleChange}
+                      className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+
+                  <button
+                    type='submit'
+                    className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
+                  >
+                    Update
+                  </button>
+                </form> */}
+              </div>
+            </div>
           </Modal>
         ) : null}
         {createProgConteModal ? (
@@ -449,43 +475,6 @@ export default function Page() {
                       className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
                   </div>
-
-                  <fieldset className='mb-4'>
-                    <legend className='text-lg font-bold text-white'>Features</legend>
-                    {fields.map((feature, index) => (
-                      <div key={feature.id} className='mb-4'>
-                        <label className='block text-white text-sm font-bold mb-2' htmlFor={`feature-key-${index}`}>
-                          Key
-                        </label>
-                        <select
-                          {...register(`features.${index}.key`)}
-                          className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
-                          id={`feature-key-${index}`}
-                        >
-                          <option value='text'>Text</option>
-                          <option value='image'>Image</option>
-                          <option value='video'>Video</option>
-                        </select>
-
-                        <label className='block text-white text-sm font-bold mb-2' htmlFor={`feature-data-${index}`}>
-                          Value
-                        </label>
-                        <input
-                          {...register(`features.${index}.data`)}
-                          className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
-                          id={`feature-data-${index}`}
-                          type='text'
-                        />
-                      </div>
-                    ))}
-                    <button
-                      type='button'
-                      className='bg-slate-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-                      onClick={() => append({ key: '', data: '' })}
-                    >
-                      Add Feature
-                    </button>
-                  </fieldset>
 
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Active:</label>

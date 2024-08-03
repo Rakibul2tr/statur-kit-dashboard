@@ -97,19 +97,23 @@ export default function Page() {
   // create data for program handel======================
   const createHandleSubmit = e => {
     e.preventDefault()
+
+    console.log('create', formData)
+
     let sendFormData = {
       title: formData.title,
       description: formData.description,
       photo_url: formData.photo_url
     }
 
-    programCreate({ sendFormData, token })
+    programCreate({ sendFormData, token: userData.token })
   }
 
   useEffect(() => {
     if (createSuccess) {
       alert('Created successful')
       refetch()
+      setCreateProgramModal(false)
     } else if (createError) {
       console.log('create program error', createError)
     }
@@ -154,11 +158,12 @@ export default function Page() {
   useEffect(() => {
     if (deleteSuccess) {
       alert('Program is Deleted')
+      refetch()
     } else if (deleteError) {
       // alert(deleteError)
       console.log('error', deleteError)
     }
-  }, [deleteSuccess, deleteError])
+  }, [deleteSuccess, deleteError, refetch])
 
   // delete a program handel end ===========================
 
@@ -227,7 +232,9 @@ export default function Page() {
                           </td>
 
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                            <Image src={item.photo_url} alt='' width={50} height={40} className='rounded' />
+                            {item.photo_url ? (
+                              <Image src={item.photo_url} alt='' width={50} height={40} className='rounded' />
+                            ) : null}
                           </td>
                           <td className=' text-sm font-medium text-right whitespace-nowrap'>
                             <div className='flex justify-between mr-2'>
@@ -258,146 +265,154 @@ export default function Page() {
       </div>
       {showModal ? (
         <Modal>
-          <button
-            onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              className='icon icon-tabler icons-tabler-outline icon-tabler-x'
-            >
-              <path stroke='none' d='M0 0h24v24H0z' fill='none' />
-              <path d='M18 6l-12 12' />
-              <path d='M6 6l12 12' />
-            </svg>
-          </button>
-          <div className='pb-3'>
-            <h2 className='text-slate-800 text-center'>Update a Program</h2>
-          </div>
-          <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Program Number :</label>
-              <input
-                type='number'
-                name='id'
-                defaultValue={formData?.id}
-                onChange={handleChange}
-                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
-            </div>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Program Title:</label>
-              <input
-                type='text'
-                name='title'
-                defaultValue={formData?.title}
-                onChange={handleChange}
-                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
-            </div>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Description:</label>
-              <textarea
-                name='description'
-                defaultValue={formData?.description}
-                onChange={handleChange}
-                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
-            </div>
-
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Photo URL:</label>
-              <input
-                type='text'
-                name='photo_url'
-                defaultValue={formData?.photo_url}
-                onChange={handleChange}
-                className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
-            </div>
-
+          <div className='relative w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg'>
             <button
-              type='submit'
-              className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
+              onClick={() => closeModal()}
+              className='cursor-pointer absolute top-2 rounded-lg right-0  m-2 bg-[#ffff00] p-2'
             >
-              Update
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                className='icon icon-tabler icons-tabler-outline icon-tabler-x'
+              >
+                <path stroke='none' d='M0 0h24v24H0z' fill='none' />
+                <path d='M18 6l-12 12' />
+                <path d='M6 6l12 12' />
+              </svg>
             </button>
-          </form>
+            <div className='pb-3'>
+              <h2 className='text-slate-800 text-center'>Update a Program</h2>
+            </div>
+            <div className='h-4/6 overflow-y-auto w-full p-4 bg-slate-900 shadow-md rounded-lg'>
+              <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+                <div className='mb-4'>
+                  <label className='block text-white font-bold mb-2'>Program Number :</label>
+                  <input
+                    type='number'
+                    name='id'
+                    defaultValue={formData?.id}
+                    onChange={handleChange}
+                    className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                  />
+                </div>
+                <div className='mb-4'>
+                  <label className='block text-white font-bold mb-2'>Content Title:</label>
+                  <input
+                    type='text'
+                    name='title'
+                    defaultValue={formData?.title}
+                    onChange={handleChange}
+                    className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                  />
+                </div>
+                <div className='mb-4'>
+                  <label className='block text-white font-bold mb-2'>Description:</label>
+                  <textarea
+                    name='description'
+                    defaultValue={formData?.description}
+                    onChange={handleChange}
+                    className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                  />
+                </div>
+
+                <div className='mb-4'>
+                  <label className='block text-white font-bold mb-2'>Photo URL:</label>
+                  <input
+                    type='text'
+                    name='photo_url'
+                    defaultValue={formData?.photo_url}
+                    onChange={handleChange}
+                    className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                  />
+                </div>
+
+                <button
+                  type='submit'
+                  className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
+                >
+                  Update
+                </button>
+              </form>
+            </div>
+          </div>
         </Modal>
       ) : null}
       {createProgramModal ? (
         <Modal>
-          <button
-            onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              className='icon icon-tabler icons-tabler-outline icon-tabler-x'
-            >
-              <path stroke='none' d='M0 0h24v24H0z' fill='none' />
-              <path d='M18 6l-12 12' />
-              <path d='M6 6l12 12' />
-            </svg>
-          </button>
-          <div className='pb-3'>
-            <h2 className='text-slate-800 text-center'>Create a Program</h2>
-          </div>
-          <form onSubmit={createHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Program Title:</label>
-              <input
-                type='text'
-                name='title'
-                defaultValue={formData?.title}
-                onChange={handleChange}
-                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
-            </div>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Description:</label>
-              <textarea
-                name='description'
-                defaultValue={formData?.description}
-                onChange={handleChange}
-                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
-            </div>
-
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Photo URL:</label>
-              <input
-                type='text'
-                name='photo_url'
-                defaultValue={formData?.photo_url}
-                onChange={handleChange}
-                className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
-            </div>
-
+          <div className='relative w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg'>
             <button
-              type='submit'
-              className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
+              onClick={() => closeModal()}
+              className='cursor-pointer absolute top-2 rounded-lg right-0  m-2 bg-[#fff555] p-2'
             >
-              Create
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                width='24'
+                height='24'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                className='icon icon-tabler icons-tabler-outline icon-tabler-x'
+              >
+                <path stroke='none' d='M0 0h24v24H0z' fill='none' />
+                <path d='M18 6l-12 12' />
+                <path d='M6 6l12 12' />
+              </svg>
             </button>
-          </form>
+            <div className='pb-3'>
+              <h2 className='text-slate-800 text-center'>Create a Program</h2>
+            </div>
+            <div className='h-4/6 overflow-y-auto w-full p-4 bg-slate-900 shadow-md rounded-lg'>
+              <form onSubmit={createHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+                <div className='mb-4'>
+                  <label className='block text-white font-bold mb-2'>Program Title:</label>
+                  <input
+                    type='text'
+                    name='title'
+                    defaultValue={formData?.title}
+                    onChange={handleChange}
+                    className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                  />
+                </div>
+                <div className='mb-4'>
+                  <label className='block text-white font-bold mb-2'>Description:</label>
+                  <textarea
+                    name='description'
+                    defaultValue={formData?.description}
+                    onChange={handleChange}
+                    className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                  />
+                </div>
+
+                <div className='mb-4'>
+                  <label className='block text-white font-bold mb-2'>Photo URL:</label>
+                  <input
+                    type='text'
+                    name='photo_url'
+                    defaultValue={formData?.photo_url}
+                    onChange={handleChange}
+                    className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                  />
+                </div>
+
+                <button
+                  type='submit'
+                  className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
+                >
+                  Create
+                </button>
+              </form>
+            </div>
+          </div>
         </Modal>
       ) : null}
     </div>

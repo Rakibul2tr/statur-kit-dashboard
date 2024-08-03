@@ -198,7 +198,7 @@ export const apiSlice = createApi({
 
     programCreate: builder.mutation({
       query: ({ token, sendFormData }) => ({
-        url: `/api/products/`,
+        url: `/api/programs/`,
         method: 'POST',
         headers: {
           authorization: `token ${token}`
@@ -322,13 +322,13 @@ export const apiSlice = createApi({
     //==============update program particular content api===============
 
     updateProgramParticular: builder.mutation({
-      query: data => ({
-        url: `/api/program-contents/${data.id}`,
+      query: (token, data, id) => ({
+        url: `/api/content-particulars/${id}/`,
         method: 'PATCH',
         headers: {
-          authorization: `token ${data?.token}`
+          authorization: `token ${token}`
         },
-        body: data.formData
+        body: data
       })
     }),
 
@@ -454,7 +454,7 @@ export const apiSlice = createApi({
 
     allBodyPartCategory: builder.query({
       query: ({ token }) => ({
-        url: `/api/products/`,
+        url: `/api/body-part-exercise-categories/`,
         method: 'GET',
         headers: {
           authorization: `token ${token}`
@@ -466,7 +466,7 @@ export const apiSlice = createApi({
 
     createBodyPartCategory: builder.mutation({
       query: ({ token, formData }) => ({
-        url: '/api/products/',
+        url: '/api/body-part-exercise-categories/',
         method: 'POST',
         headers: {
           authorization: `token ${token}`
@@ -479,13 +479,12 @@ export const apiSlice = createApi({
 
     updateBodyPartCategory: builder.mutation({
       query: ({ token, formData, id }) => ({
-        url: `/api/products/${id}/`,
+        url: `/api/body-part-exercise-categories/${id}/`,
         method: 'PATCH',
         headers: {
-          authorization: `token ${token}`,
-          'Content-Type': 'application/json'
+          authorization: `token ${token}`
         },
-        body: JSON.stringify(formData)
+        body: formData
       })
     }),
 
@@ -493,7 +492,7 @@ export const apiSlice = createApi({
 
     deleteBodyPartCategory: builder.mutation({
       query: ({ token, id }) => ({
-        url: `/api/products/${id}/`,
+        url: `/api/body-part-exercise-categories/${id}/`,
         method: 'DELETE',
         headers: {
           authorization: `token ${token}`
@@ -501,11 +500,11 @@ export const apiSlice = createApi({
       })
     }),
 
-    //==============Get all body part api===============
+    //==============Get body part content api===============
 
-    allBodyPartList: builder.query({
+    getBodyPartContent: builder.query({
       query: ({ token }) => ({
-        url: `/api/products/`,
+        url: `/api/body-part-exercise-contents/`,
         method: 'GET',
         headers: {
           authorization: `token ${token}`
@@ -513,11 +512,61 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============Create a body part  api==============
+    //===============Create a body part  content api==============
 
-    createBodyPart: builder.mutation({
+    createBodyPartContent: builder.mutation({
+      query: ({ token, data }) => ({
+        url: '/api/body-part-exercise-contents/',
+        method: 'POST',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: data
+      })
+    }),
+
+    //===============update a body part content api==============
+
+    updateBodyPartContent: builder.mutation({
+      query: ({ token, data, id }) => ({
+        url: `/api/body-part-exercise-contents/${id}/`,
+        method: 'PATCH',
+        headers: {
+          authorization: `token ${token}`
+        },
+        body: data
+      })
+    }),
+
+    //===============delete a body part content api==============
+
+    deleteBodyPartContent: builder.mutation({
+      query: ({ token, id }) => ({
+        url: `/api/body-part-exercise-contents/${id}/`,
+        method: 'DELETE',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //*********************** influencer screens api start **************** */
+    //===============get influencer data api==============
+    getInfluencerList: builder.query({
+      query: ({ token }) => ({
+        url: `/api/influencers/`,
+        method: 'GET',
+        headers: {
+          authorization: `token ${token}`
+        }
+      })
+    }),
+
+    //===============Create a influencer  api==============
+
+    createInfluencer: builder.mutation({
       query: ({ token, formData }) => ({
-        url: '/api/products/',
+        url: '/api/influencers/',
         method: 'POST',
         headers: {
           authorization: `token ${token}`
@@ -526,25 +575,24 @@ export const apiSlice = createApi({
       })
     }),
 
-    //===============update a body part api==============
+    //===============update a influencer api==============
 
-    updateBodyPart: builder.mutation({
+    updateInfluencer: builder.mutation({
       query: ({ token, formData, id }) => ({
-        url: `/api/products/${id}/`,
+        url: `/api/influencers/${id}/`,
         method: 'PATCH',
         headers: {
-          authorization: `token ${token}`,
-          'Content-Type': 'application/json'
+          authorization: `token ${token}`
         },
-        body: JSON.stringify(formData)
+        body: formData
       })
     }),
 
-    //===============delete a body part api==============
+    //===============delete a influencer api==============
 
-    deleteBodyPart: builder.mutation({
+    deleteInfluencer: builder.mutation({
       query: ({ token, id }) => ({
-        url: `/api/products/${id}/`,
+        url: `/api/influencers/${id}/`,
         method: 'DELETE',
         headers: {
           authorization: `token ${token}`
@@ -616,8 +664,14 @@ export const {
   useCreateBodyPartCategoryMutation,
   useUpdateBodyPartCategoryMutation,
   useDeleteBodyPartCategoryMutation,
-  useAllBodyPartListQuery,
-  useCreateBodyPartMutation,
-  useUpdateBodyPartMutation,
-  useDeleteBodyPartMutation
+  useGetBodyPartContentQuery,
+  useCreateBodyPartContentMutation,
+  useUpdateBodyPartContentMutation,
+  useDeleteBodyPartContentMutation,
+
+  // ================ influencer api ============
+  useGetInfluencerListQuery,
+  useCreateInfluencerMutation,
+  useUpdateInfluencerMutation,
+  useDeleteInfluencerMutation
 } = apiSlice
