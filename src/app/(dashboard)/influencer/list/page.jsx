@@ -130,7 +130,11 @@ export default function Page() {
       setCreateModal(false)
       refetch()
     } else if (createError) {
-      console.log('create program error', createError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [createSuccess, createError, refetch])
 
@@ -146,11 +150,19 @@ export default function Page() {
 
   useEffect(() => {
     if (updateSuccess) {
-      alert('updated Successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Updated successful!',
+        icon: 'success'
+      })
       setShowModal(false)
       refetch()
     } else if (updateError) {
-      console.log(updateError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [updateSuccess, updateError, refetch])
 
@@ -163,11 +175,18 @@ export default function Page() {
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Program is Deleted')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Influencer is Deleted!',
+        icon: 'success'
+      })
       refetch()
     } else if (deleteError) {
-      // alert(deleteError)
-      console.log('error', deleteError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [deleteSuccess, deleteError, refetch])
 

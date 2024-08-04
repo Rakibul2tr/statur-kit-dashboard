@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 'use client'
 import React, { useEffect, useState } from 'react'
 
@@ -10,6 +11,8 @@ import {
   useUpdateProductCategoryMutation
 } from '@/redux/api/apiSlice'
 import Modal from '../../../components/Modal'
+
+import Swal from 'sweetalert2'
 
 const theadData = [
   {
@@ -106,8 +109,6 @@ export default function Page() {
     setCreateCategoryModal(false)
   }
 
-
-
   // category data update handel============================
 
   const id = selectedItem.id
@@ -120,11 +121,19 @@ export default function Page() {
 
   useEffect(() => {
     if (success) {
-      alert('updated successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Updated successful!',
+        icon: 'success'
+      })
       setShowModal(false)
       refetch()
     } else if (updateError) {
-      alert(updateError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [success, updateError, refetch])
 
@@ -144,11 +153,19 @@ export default function Page() {
 
   useEffect(() => {
     if (createSuccess) {
-      alert('Category Created successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Category created successful!',
+        icon: 'success'
+      })
       setCreateCategoryModal(false)
       refetch()
     } else if (CreateError) {
-      alert('Created field!')
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [createSuccess, CreateError, refetch])
 
@@ -159,11 +176,18 @@ export default function Page() {
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Product is Deleted')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Category  deleted!',
+        icon: 'success'
+      })
       refetch()
     } else if (deleteError) {
-      // alert(deleteError)
-      console.log('error', deleteError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [deleteSuccess, deleteError, refetch])
 

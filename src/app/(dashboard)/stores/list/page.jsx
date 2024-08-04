@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
+import Swal from 'sweetalert2'
+
 import {
   useAllProductQuery,
   useCreateProductMutation,
@@ -114,12 +116,20 @@ export default function Page() {
 
   useEffect(() => {
     if (createSuccess) {
-      alert('Product is Created')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Created successful!',
+        icon: 'success'
+      })
       setCreateProductModal(false)
       refetch()
       setFormData({})
     } else if (createError) {
-      alert(createError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [createSuccess, createError, refetch])
 
@@ -141,12 +151,20 @@ export default function Page() {
 
   useEffect(() => {
     if (success) {
-      alert('updated Successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Updated successful!',
+        icon: 'success'
+      })
       setShowModal(false)
       refetch()
       setFormData({})
     } else if (error) {
-      console.log(error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [success, error, refetch])
 
@@ -157,10 +175,18 @@ export default function Page() {
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Product is Deleted')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Product is deleted!',
+        icon: 'success'
+      })
       refetch()
     } else if (deleteError) {
-      alert(deleteError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [deleteSuccess, deleteError, refetch])
 

@@ -5,6 +5,8 @@ import Image from 'next/image'
 
 import { useForm, useFieldArray } from 'react-hook-form'
 
+import Swal from 'sweetalert2'
+
 import Modal from '../../../components/Modal'
 
 import {
@@ -102,11 +104,19 @@ export default function Page() {
 
   useEffect(() => {
     if (createSuccess) {
-      alert('Created successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Created successful!',
+        icon: 'success'
+      })
       setCreateProgConteModal(false)
       refetch()
     } else if (createError) {
-      console.log('create program error', createError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [createSuccess, createError, refetch])
 
@@ -114,8 +124,6 @@ export default function Page() {
   const token = userData.token
 
   const updateOnSubmit = data => {
-    console.log('update data', data)
-
     updateProgramContent({
       token: token,
       formData: data,
@@ -125,11 +133,19 @@ export default function Page() {
 
   useEffect(() => {
     if (success) {
-      alert('updated Successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Updated successful!',
+        icon: 'success'
+      })
       setUpdateModal(false)
       refetch()
     } else if (error) {
-      console.log(error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [success, error, refetch])
 
@@ -140,11 +156,19 @@ export default function Page() {
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Program is Deleted')
+      alert('')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Program content is deleted!',
+        icon: 'success'
+      })
       refetch()
     } else if (deleteError) {
-      // alert(deleteError)
-      console.log('error', deleteError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [deleteSuccess, deleteError, refetch])
 
@@ -500,5 +524,3 @@ export default function Page() {
     </div>
   )
 }
-
-

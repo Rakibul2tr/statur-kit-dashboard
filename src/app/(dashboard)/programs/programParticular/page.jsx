@@ -5,6 +5,8 @@ import Image from 'next/image'
 
 import { useForm, useFieldArray } from 'react-hook-form'
 
+import Swal from 'sweetalert2'
+
 import Modal from '../../../components/Modal'
 
 import CodeEditor from '../../../components/CodeEditor'
@@ -131,19 +133,24 @@ export default function Page() {
 
   const createOnSubmit = data => {
     data.content = parseInt(data.content)
-
-    console.log('create data', data)
-
     createProgramParticular({ data, token: userData.token })
   }
 
   useEffect(() => {
     if (createSuccess) {
-      alert('Created successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Created successful!',
+        icon: 'success'
+      })
       setCreateProgConteModal(false)
       refetch()
     } else if (createError) {
-      console.log('create program error', createError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [createSuccess, createError, refetch])
 
@@ -162,11 +169,19 @@ export default function Page() {
 
   useEffect(() => {
     if (updateSuccess) {
-      alert('updated Successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Updated successful!',
+        icon: 'success'
+      })
       setUpdateModal(false)
       refetch()
     } else if (error) {
-      console.log(error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [updateSuccess, error, refetch])
 
@@ -177,11 +192,18 @@ export default function Page() {
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Program is Deleted')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Program is deleted!',
+        icon: 'success'
+      })
       refetch()
     } else if (deleteError) {
-      // alert(deleteError)
-      console.log('error', deleteError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [deleteSuccess, deleteError, refetch])
 

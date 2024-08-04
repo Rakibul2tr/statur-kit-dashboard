@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
+import Swal from 'sweetalert2'
+
 import Modal from '../../../components/Modal'
 import { useProgramDataGetQuery, useUpdateProgramDataMutation } from '@/redux/api/programsApislice'
 import { useDeleteProgramMutation, useProgramCreateMutation } from '@/redux/api/apiSlice'
@@ -111,11 +113,19 @@ export default function Page() {
 
   useEffect(() => {
     if (createSuccess) {
-      alert('Created successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Created successful!',
+        icon: 'success'
+      })
       refetch()
       setCreateProgramModal(false)
     } else if (createError) {
-      console.log('create program error', createError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [createSuccess, createError, refetch])
 
@@ -140,11 +150,19 @@ export default function Page() {
 
   useEffect(() => {
     if (success) {
-      alert('updated Successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Updated successful!',
+        icon: 'success'
+      })
       setShowModal(false)
       refetch()
     } else if (error) {
-      console.log(error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [success, error, refetch])
 
@@ -157,11 +175,18 @@ export default function Page() {
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Program is Deleted')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Program is Deleted!',
+        icon: 'success'
+      })
       refetch()
     } else if (deleteError) {
-      // alert(deleteError)
-      console.log('error', deleteError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
   }, [deleteSuccess, deleteError, refetch])
 
