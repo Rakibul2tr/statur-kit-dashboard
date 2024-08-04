@@ -77,7 +77,7 @@ const LoginV2 = () => {
           'flex md:bs-full items-center justify-center flex-1 min-bs-[100dvh] max-md:min-bs-24 relative p-6   bg-backgroundPaper'
         )}
       >
-        <Image src='/images/logo/admin-bg-t.png' alt='' width={500} height={400} priority={false} />
+        <Image src='/images/logo/admin-bg-t.png' alt='' width={600} height={300} priority={false} />
       </div>
       <div className='flex justify-center items-center md:bs-full max-md:bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px] '>
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
