@@ -117,7 +117,6 @@ export default function Page() {
     name: 'features'
   })
 
-  console.log('fild', watch)
 
   useEffect(() => {
     if (selectedItem) {

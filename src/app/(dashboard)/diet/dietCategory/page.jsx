@@ -1,6 +1,10 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
+import Image from 'next/image'
+
+import Swal from 'sweetalert2'
+
 import {
   useAllDietCategoryQuery,
   useCreateDietCategoryMutation,
@@ -13,9 +17,7 @@ const theadData = [
   {
     diet_Id: 'Product Id',
     title: 'title',
-    category_id: 'category Id',
-    category_title: 'category Title',
-    discount: 'Discount Percent',
+    image: 'image',
     action: 'Action'
   }
 ]
@@ -44,9 +46,10 @@ export default function Page() {
     title: selectedItem.title || '',
     description: selectedItem.description || '',
     photo_url: selectedItem.photo_url || '',
-    discount_percent: selectedItem.discount_percent || 0,
     is_active: true
   })
+
+  console.log('diet ca', allDietList)
 
   useEffect(() => {
     const localData = async () => {
@@ -78,7 +81,7 @@ export default function Page() {
 
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'discount_percent' ? Number(value) : value
+      [name]: value
     }))
   }
 
@@ -111,17 +114,24 @@ export default function Page() {
   // create diet Category ======================================
   const createHandel = e => {
     e.preventDefault()
-    console.log('create handel')
+    console.log('create handel', formData)
+
+    createDietCategory({ token: userData.token, formData })
   }
 
   useEffect(() => {
     if (createSuccess) {
-      alert('Create Successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Create Successful!',
+        icon: 'success'
+      })
       setCreateModal(false)
+      refetch()
     } else if (createError) {
       console.log(createError)
     }
-  }, [createSuccess, createError])
+  }, [createSuccess, createError, refetch])
 
   // diet update handel=================================
   const updateHandleSubmit = async e => {
@@ -141,12 +151,17 @@ export default function Page() {
 
   useEffect(() => {
     if (updateSuccess) {
-      alert('Create Successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Update Successful!',
+        icon: 'success'
+      })
       setShowModal(false)
+      refetch()
     } else if (updateError) {
       console.log(updateError)
     }
-  }, [updateSuccess, updateError])
+  }, [updateSuccess, updateError, refetch])
 
   //single diet delete handel============================
   const DeleteHandel = id => {
@@ -155,10 +170,14 @@ export default function Page() {
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Diet Item is Deleted')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Deleted Successful!',
+        icon: 'success'
+      })
       refetch()
     } else if (deleteError) {
-      alert(deleteError)
+      console.log(deleteError)
     }
   }, [deleteSuccess, deleteError, refetch])
 
@@ -196,6 +215,7 @@ export default function Page() {
           />
         </div>
       </div>
+
       <div className='overflow-hidden'>
         <div className='flex flex-col'>
           <div className='overflow-x-auto'>
@@ -222,14 +242,10 @@ export default function Page() {
                           <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
 
-                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item?.category?.id}</td>
-
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                            {item?.category?.title}
-                          </td>
-
-                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                            {item?.discount_percent}
+                            {item.photo_url ? (
+                              <Image src={item.photo_url} alt='' width={50} height={40} className='rounded' />
+                            ) : null}
                           </td>
 
                           <td className=' text-sm font-medium text-right whitespace-nowrap'>
@@ -259,12 +275,11 @@ export default function Page() {
           </div>
         </div>
       </div>
-      {/* diet update  */}
       {showModal ? (
         <Modal>
           <button
             onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+            className='cursor-pointer absolute top-6 rounded-lg right-2  m-2 bg-[#ffff00] p-2'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -288,23 +303,7 @@ export default function Page() {
           </div>
           <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Diet Category</label>
-
-              <select
-                name='category'
-                value={formData.category}
-                onChange={handleChange}
-                className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              >
-                {productCategory.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Title:</label>
+              <label className='block text-white font-bold mb-2'>Diet category title:</label>
               <input
                 type='text'
                 name='title'
@@ -334,16 +333,6 @@ export default function Page() {
               />
             </div>
 
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>discount Percentage:</label>
-              <input
-                type='number'
-                name='discount_percent'
-                defaultValue={formData?.discount_percent}
-                onChange={handleChange}
-                className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
-            </div>
             <button
               type='submit'
               className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
@@ -358,7 +347,7 @@ export default function Page() {
         <Modal>
           <button
             onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+            className='cursor-pointer absolute top-6 rounded-lg right-2  m-2 bg-[#ffff00] p-2'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -382,7 +371,7 @@ export default function Page() {
           </div>
 
           <form onSubmit={createHandel} className='max-w-xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
-            <div className='mb-4'>
+            {/* <div className='mb-4'>
               <label className='block text-white font-bold mb-2'>Diet Category Id :</label>
               <select
                 name='category'
@@ -390,13 +379,15 @@ export default function Page() {
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               >
-                {productCategory.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.value}
-                  </option>
-                ))}
+                {allDietList.map(category => {
+                  return (
+                    <option key={category.id} value={category.id}>
+                      {category.title}
+                    </option>
+                  )
+                })}
               </select>
-            </div>
+            </div> */}
             <div className='mb-4'>
               <label className='block text-white font-bold mb-2'>Diet Title:</label>
               <input

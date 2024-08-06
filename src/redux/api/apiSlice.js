@@ -350,7 +350,7 @@ export const apiSlice = createApi({
 
     allDietCategory: builder.query({
       query: ({ token }) => ({
-        url: `/api/products/`,
+        url: `/api/diet-categories/`,
         method: 'GET',
         headers: {
           authorization: `token ${token}`
@@ -362,7 +362,7 @@ export const apiSlice = createApi({
 
     createDietCategory: builder.mutation({
       query: ({ token, formData }) => ({
-        url: '/api/products/',
+        url: '/api/diet-categories/',
         method: 'POST',
         headers: {
           authorization: `token ${token}`
@@ -375,13 +375,12 @@ export const apiSlice = createApi({
 
     updateDietCategory: builder.mutation({
       query: ({ token, formData, id }) => ({
-        url: `/api/products/${id}/`,
+        url: `/api/diet-categories/${id}/`,
         method: 'PATCH',
         headers: {
-          authorization: `token ${token}`,
-          'Content-Type': 'application/json'
+          authorization: `token ${token}`
         },
-        body: JSON.stringify(formData)
+        body: formData
       })
     }),
 
@@ -389,7 +388,7 @@ export const apiSlice = createApi({
 
     deleteDietCategory: builder.mutation({
       query: ({ token, id }) => ({
-        url: `/api/products/${id}/`,
+        url: `/api/diet-categories/${id}/`,
         method: 'DELETE',
         headers: {
           authorization: `token ${token}`
@@ -401,7 +400,7 @@ export const apiSlice = createApi({
 
     allDietList: builder.query({
       query: ({ token }) => ({
-        url: `/api/products/`,
+        url: `/api/diet-plans/`,
         method: 'GET',
         headers: {
           authorization: `token ${token}`
@@ -413,7 +412,7 @@ export const apiSlice = createApi({
 
     createDiet: builder.mutation({
       query: ({ token, formData }) => ({
-        url: '/api/products/',
+        url: '/api/diet-plans/',
         method: 'POST',
         headers: {
           authorization: `token ${token}`
@@ -426,7 +425,7 @@ export const apiSlice = createApi({
 
     updateDiet: builder.mutation({
       query: ({ token, formData, id }) => ({
-        url: `/api/products/${id}/`,
+        url: `/api/diet-plans/${id}/`,
         method: 'PATCH',
         headers: {
           authorization: `token ${token}`,
@@ -440,7 +439,7 @@ export const apiSlice = createApi({
 
     deleteDiet: builder.mutation({
       query: ({ token, id }) => ({
-        url: `/api/products/${id}/`,
+        url: `/api/diet-plans/${id}/`,
         method: 'DELETE',
         headers: {
           authorization: `token ${token}`

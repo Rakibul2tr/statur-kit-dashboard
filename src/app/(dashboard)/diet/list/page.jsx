@@ -1,7 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
+import Swal from 'sweetalert2'
+
+import { useForm, useFieldArray } from 'react-hook-form'
+
 import {
+  useAllDietCategoryQuery,
   useAllDietListQuery,
   useCreateDietMutation,
   useDeleteDietMutation,
@@ -29,6 +34,8 @@ export default function Page() {
   const [selectedItem, setSelectedItem] = useState({})
 
   // api fetching
+  const { data: allDietCatList } = useAllDietCategoryQuery(userData ? { token: userData?.token } : null)
+
   const { data: allDietList, isSuccess, refetch } = useAllDietListQuery(userData ? { token: userData?.token } : null)
   const [createDiet, { isSuccess: createSuccess, error: createError }] = useCreateDietMutation()
   const [updateDiet, { data, isSuccess: updateSuccess, error: updateError }] = useUpdateDietMutation()
@@ -39,8 +46,9 @@ export default function Page() {
     title: selectedItem.title || '',
     description: selectedItem.description || '',
     photo_url: selectedItem.photo_url || '',
-    discount_percent: selectedItem.discount_percent || 0,
-    is_active: true
+    data: selectedItem?.data || { key: '', data: '', type: '' },
+    is_active: true,
+    is_featured: false
   })
 
   useEffect(() => {
@@ -68,12 +76,28 @@ export default function Page() {
 
   // modal for data update
 
+  // Handle input changes for static fields
   const handleChange = e => {
+    const { name, value, type, checked } = e.target
+
+    setFormData(prev => ({
+      ...prev,
+
+      [name]: type === 'checkbox' ? checked : name === 'category' ? Number(value) : value
+    }))
+  }
+
+  // Handle input changes for dynamic fields
+
+  const handleDataChange = e => {
     const { name, value } = e.target
 
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'discount_percent' ? Number(value) : value
+      data: {
+        ...prev.data,
+        [name]: value
+      }
     }))
   }
 
@@ -104,19 +128,63 @@ export default function Page() {
   }
 
   // create diet======================================
-  const createDietHandel = e => {
-    e.preventDefault()
-    console.log('create handel')
+  // create program particular content data handel=====================
+
+  const { register, handleSubmit, control, watch, setValue } = useForm({
+    defaultValues: {
+      category: selectedItem?.category || '',
+      title: selectedItem?.title || '',
+      description: selectedItem?.description || '',
+      data: selectedItem?.data || [{ key: '', data: '', type: '' }],
+      is_active: selectedItem?.is_active || false
+    }
+  })
+
+  const {
+    fields: dataFields,
+    append: appendData,
+    remove: removeData
+  } = useFieldArray({
+    control,
+    name: 'data'
+  })
+
+  useEffect(() => {
+    if (selectedItem) {
+      setValue('category', selectedItem.category)
+      setValue('title', selectedItem.title)
+      setValue('description', selectedItem.description)
+      setValue('data', selectedItem.data)
+      setValue('is_active', selectedItem.is_active)
+    }
+  }, [selectedItem, setValue])
+
+  const createOnSubmit = data => {
+    data.category = parseInt(data.category)
+    console.log('data', data)
+    createDiet({
+      token: userData.token,
+      formData: data
+    })
   }
 
   useEffect(() => {
     if (createSuccess) {
-      alert('Create Successful')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Created successful!',
+        icon: 'success'
+      })
       setCreateModal(false)
+      refetch()
     } else if (createError) {
-      console.log(createError)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong!'
+      })
     }
-  }, [createSuccess, createError])
+  }, [createSuccess, createError, refetch])
 
   // diet update handel=================================
   const updateHandleSubmit = async e => {
@@ -138,10 +206,11 @@ export default function Page() {
     if (updateSuccess) {
       alert('Create Successful')
       setShowModal(false)
+      refetch()
     } else if (updateError) {
       console.log(updateError)
     }
-  }, [updateSuccess, updateError])
+  }, [updateSuccess, updateError, refetch])
 
   //single diet delete handel============================
   const dietDeleteHandel = id => {
@@ -150,7 +219,11 @@ export default function Page() {
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('Diet Item is Deleted')
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Diet item is deleted!',
+        icon: 'success'
+      })
       refetch()
     } else if (deleteError) {
       alert(deleteError)
@@ -262,7 +335,7 @@ export default function Page() {
         <Modal>
           <button
             onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+            className='cursor-pointer absolute top-6 rounded-lg right-2  m-2 bg-[#ffff00] p-2'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -286,7 +359,7 @@ export default function Page() {
           </div>
           <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Category</label>
+              <label className='block text-white font-bold mb-2'>Diet category</label>
 
               <select
                 name='category'
@@ -294,15 +367,17 @@ export default function Page() {
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               >
-                {productCategory.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.value}
-                  </option>
-                ))}
+                {allDietCatList.map(category => {
+                  return (
+                    <option key={category.id} value={category.id}>
+                      {category.title}
+                    </option>
+                  )
+                })}
               </select>
             </div>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Title:</label>
+              <label className='block text-white font-bold mb-2'>Diet plan Title:</label>
               <input
                 type='text'
                 name='title'
@@ -332,16 +407,6 @@ export default function Page() {
               />
             </div>
 
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>discount Percentage:</label>
-              <input
-                type='number'
-                name='discount_percent'
-                defaultValue={formData?.discount_percent}
-                onChange={handleChange}
-                className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-              />
-            </div>
             <button
               type='submit'
               className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
@@ -351,12 +416,12 @@ export default function Page() {
           </form>
         </Modal>
       ) : null}
-      {/* diet create */}
+
       {createModal ? (
         <Modal>
           <button
             onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+            className='cursor-pointer absolute top-6 rounded-lg right-2 m-2 bg-[#ffff00] p-2'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -379,38 +444,39 @@ export default function Page() {
             <h2 className='text-slate-800 text-center'>Create a diet</h2>
           </div>
 
-          <form onSubmit={createDietHandel} className='max-w-xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
+          <form
+            onSubmit={handleSubmit(createOnSubmit)}
+            className='max-w-xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'
+          >
             <div className='mb-4'>
               <label className='block text-white font-bold mb-2'>Diet Category Id :</label>
               <select
                 name='category'
-                value={formData.category}
+                {...register('category')}
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               >
-                {productCategory.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.value}
-                  </option>
-                ))}
+                {allDietCatList.map(category => {
+                  return (
+                    <option key={category.id} value={category.id}>
+                      {category.title}
+                    </option>
+                  )
+                })}
               </select>
             </div>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Diet Title:</label>
+              <label className='block text-white font-bold mb-2'>Diet plan Title:</label>
               <input
                 type='text'
-                name='title'
-                defaultValue={formData?.title}
-                onChange={handleChange}
+                {...register('title')}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
             </div>
             <div className='mb-4'>
               <label className='block text-white font-bold mb-2'>Description:</label>
               <textarea
-                name='description'
-                defaultValue={formData?.description}
-                onChange={handleChange}
+                {...register('description')}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
             </div>
@@ -419,11 +485,120 @@ export default function Page() {
               <label className='block text-white font-bold mb-2'>Photo URL:</label>
               <input
                 type='text'
-                name='photo_url'
-                defaultValue={formData?.photo_url}
-                onChange={handleChange}
+                {...register('photo_url')}
                 className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
+            </div>
+            <fieldset className='mb-4'>
+              <legend className='text-lg font-bold text-white'>Data</legend>
+              {dataFields.map((item, index) => (
+                <div key={item.id} className='mb-4'>
+                  <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-type-${index}`}>
+                    Select field type
+                  </label>
+                  <select
+                    {...register(`data.${index}.type`)}
+                    className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
+                    id={`data-type-${index}`}
+                    defaultValue={item.type}
+                  >
+                    <option value='text'>Text</option>
+                    <option value='image'>Image</option>
+                    <option value='video'>Video</option>
+                  </select>
+                  <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-key-${index}`}>
+                    select name
+                  </label>
+                  <select
+                    {...register(`data.${index}.key`)}
+                    className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
+                    id={`data-type-${index}`}
+                    defaultValue={item.key}
+                  >
+                    <option value='title'>Title</option>
+                    <option value='sub_title'>Sub Title</option>
+                    <option value='description'>Description</option>
+                    <option value='list_text'>List Text</option>
+                    <option value='image'>image</option>
+                    <option value='video'>video</option>
+                  </select>
+
+                  <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
+                    Value
+                  </label>
+                  <input
+                    {...register(`data.${index}.data`)}
+                    className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                    id={`data-data-${index}`}
+                    type='text'
+                    defaultValue={item.data}
+                  />
+
+                  <button
+                    type='button'
+                    className='bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2'
+                    onClick={() => removeData(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type='button'
+                className='bg-[#fff000] hover:bg-[#ffff222] text-slate-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+                onClick={() => appendData({ key: '', data: '', type: '' })}
+              >
+                Add Data
+              </button>
+            </fieldset>
+            {/* <div className='mb-4'>
+              <label className='block text-white font-bold mb-2' htmlFor='data_key'>
+                Data Key
+              </label>
+              <input
+                type='text'
+                id='data_key'
+                name='key'
+                value={formData.data?.key}
+                onChange={handleDataChange}
+                className='w-full p-2 border rounded bg-slate-700 text-white'
+              />
+            </div>
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2' htmlFor='data_type'>
+                Data Type
+              </label>
+              <input
+                type='text'
+                id='data_type'
+                name='type'
+                value={formData.data?.type}
+                onChange={handleDataChange}
+                className='w-full p-2 border rounded bg-slate-700 text-white'
+              />
+            </div>
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2' htmlFor='data_data'>
+                Data
+              </label>
+              <input
+                type='text'
+                id='data_data'
+                name='data'
+                value={formData.data?.data}
+                onChange={handleDataChange}
+                className='w-full p-2 border rounded bg-slate-700 text-white'
+              />
+            </div> */}
+
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Active:</label>
+              <div className='flex items-center'>
+                <input type='checkbox' {...register('is_active')} className='toggle-checkbox ' id='is_active' />
+                <label htmlFor='is_active' className='ml-2 text-white'>
+                  {watch('is_active') ? 'Active' : 'Inactive'}
+                </label>
+              </div>
             </div>
 
             <button
