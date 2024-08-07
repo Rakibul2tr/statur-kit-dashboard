@@ -97,6 +97,8 @@ export default function Page() {
     }
   })
 
+  console.log('selectedItem', selectedItem)
+
   const {
     fields: dataFields,
     append: appendData,
@@ -333,7 +335,7 @@ export default function Page() {
                     <label className='block text-white font-bold mb-2'>Content Name:</label>
                     <select
                       {...register('content')}
-                      defaultValue={selectedItem?.content?.id}
+                      defaultValue={selectedItem?.content?.title}
                       className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     >
                       {programsContent?.map((i, index) => (
