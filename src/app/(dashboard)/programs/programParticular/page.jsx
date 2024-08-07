@@ -22,8 +22,6 @@ import DynamicForm from '../../../components/FormTest'
 
 const theadData = [
   {
-    particular_Id: 'particular Id',
-    content_Id: 'content id',
     content_name: 'content name',
     content_image: 'content image',
     particular_title: 'title',
@@ -116,7 +114,6 @@ export default function Page() {
     control,
     name: 'features'
   })
-
 
   useEffect(() => {
     if (selectedItem) {
@@ -266,19 +263,15 @@ export default function Page() {
                       {programsParticular?.map((item, index) => {
                         return (
                           <tr key={index}>
-                            <td className='px-4 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>
-                              {item?.id}
-                            </td>
-                            <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden'>
-                              {item?.content?.id}
-                            </td>
                             <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden'>
                               {item?.content?.title}
                             </td>
                             <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>
                               <Image src={item?.content?.photo_url} alt='' width={50} height={40} className='rounded' />
                             </td>
-                            <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>{item?.title}</td>
+                            <td className='px-4 max-w-48 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis'>
+                              {item?.title}
+                            </td>
 
                             <td className='px-4 max-w-48 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis'>
                               {item?.description}

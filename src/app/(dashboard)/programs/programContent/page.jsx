@@ -19,11 +19,9 @@ import {
 
 const theadData = [
   {
-    content_id: 'content Id',
-    program_Id: 'Program Id',
     program_name: 'Program name',
     program_image: 'Program image',
-    title: 'title',
+    content_title: 'title',
     description: 'Description',
     photo_url: 'photo_url',
     actions: 'actions'
@@ -236,10 +234,6 @@ export default function Page() {
 
                         return (
                           <tr key={item.id}>
-                            <td className='px-4 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>
-                              {item.id}
-                            </td>
-                            <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.program.id}</td>
                             <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden'>
                               {item.program.title}
                             </td>

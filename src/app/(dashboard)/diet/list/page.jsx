@@ -5,6 +5,8 @@ import Swal from 'sweetalert2'
 
 import { useForm, useFieldArray } from 'react-hook-form'
 
+import CustomEditor from '../../../components/CustomEditor'
+
 import {
   useAllDietCategoryQuery,
   useAllDietListQuery,
@@ -50,6 +52,10 @@ export default function Page() {
     is_active: true,
     is_featured: false
   })
+
+  const [chengInput, setChangeInput] = useState({ value: '' })
+
+  console.log('input change', chengInput)
 
   useEffect(() => {
     const localData = async () => {
@@ -156,16 +162,18 @@ export default function Page() {
       setValue('description', selectedItem.description)
       setValue('data', selectedItem.data)
       setValue('is_active', selectedItem.is_active)
+      setValue('html', selectedItem.html)
     }
   }, [selectedItem, setValue])
 
   const createOnSubmit = data => {
     data.category = parseInt(data.category)
     console.log('data', data)
-    createDiet({
-      token: userData.token,
-      formData: data
-    })
+
+    // createDiet({
+    //   token: userData.token,
+    //   formData: data
+    // })
   }
 
   useEffect(() => {
@@ -501,11 +509,17 @@ export default function Page() {
                     className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
                     id={`data-type-${index}`}
                     defaultValue={item.type}
+                    onChange={e => setChangeInput(e.target.value)}
                   >
                     <option value='text'>Text</option>
                     <option value='image'>Image</option>
                     <option value='video'>Video</option>
+                    <option value='pdf'>Pdf</option>
                   </select>
+
+                  {/* <CustomEditor setValue={setValue} /> */}
+
+                  {/* {chengInput == 'text' && <CodeEditor setValue={setValue} />} */}
                   <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-key-${index}`}>
                     select name
                   </label>
@@ -521,6 +535,7 @@ export default function Page() {
                     <option value='list_text'>List Text</option>
                     <option value='image'>image</option>
                     <option value='video'>video</option>
+                    <option value='pdf'>Pdf</option>
                   </select>
 
                   <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
@@ -551,45 +566,6 @@ export default function Page() {
                 Add Data
               </button>
             </fieldset>
-            {/* <div className='mb-4'>
-              <label className='block text-white font-bold mb-2' htmlFor='data_key'>
-                Data Key
-              </label>
-              <input
-                type='text'
-                id='data_key'
-                name='key'
-                value={formData.data?.key}
-                onChange={handleDataChange}
-                className='w-full p-2 border rounded bg-slate-700 text-white'
-              />
-            </div>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2' htmlFor='data_type'>
-                Data Type
-              </label>
-              <input
-                type='text'
-                id='data_type'
-                name='type'
-                value={formData.data?.type}
-                onChange={handleDataChange}
-                className='w-full p-2 border rounded bg-slate-700 text-white'
-              />
-            </div>
-            <div className='mb-4'>
-              <label className='block text-white font-bold mb-2' htmlFor='data_data'>
-                Data
-              </label>
-              <input
-                type='text'
-                id='data_data'
-                name='data'
-                value={formData.data?.data}
-                onChange={handleDataChange}
-                className='w-full p-2 border rounded bg-slate-700 text-white'
-              />
-            </div> */}
 
             <div className='mb-4'>
               <label className='block text-white font-bold mb-2'>Active:</label>

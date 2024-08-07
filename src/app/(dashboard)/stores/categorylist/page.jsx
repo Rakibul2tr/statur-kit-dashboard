@@ -16,7 +16,6 @@ import Swal from 'sweetalert2'
 
 const theadData = [
   {
-    category_id: 'category Id',
     category_title: 'category Title',
     description: 'description',
     photo: 'photo',
@@ -171,7 +170,7 @@ export default function Page() {
 
   //category delete handel===================================
   const categoryDeleteHandel = id => {
-    deleteCategory({ id, token: userData?.token })
+    deleteCategory({ id: id, token: userData?.token })
   }
 
   useEffect(() => {
@@ -183,6 +182,7 @@ export default function Page() {
       })
       refetch()
     } else if (deleteError) {
+      console.log('deleteError', deleteError)
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -248,7 +248,6 @@ export default function Page() {
                     {allCategory?.map(item => {
                       return (
                         <tr key={item.id}>
-                          <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
                           {item?.title && (
                             <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
                           )}
@@ -297,7 +296,7 @@ export default function Page() {
         <Modal>
           <button
             onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+            className='cursor-pointer absolute top-6 rounded-lg right-2  m-2 bg-[#ffff00] p-2'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -320,7 +319,7 @@ export default function Page() {
             <h2 className='text-slate-800 text-center'>Update a category</h2>
           </div>
           <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
-            <div className='mb-4'>
+            {/* <div className='mb-4'>
               <label className='block text-white font-bold mb-2'>Category ID:</label>
               <input
                 type='number'
@@ -329,9 +328,9 @@ export default function Page() {
                 onChange={handleChange}
                 className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
               />
-            </div>
+            </div> */}
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Title:</label>
+              <label className='block text-white font-bold mb-2'>Category Name:</label>
               <input
                 type='text'
                 name='title'
@@ -374,7 +373,7 @@ export default function Page() {
         <Modal>
           <button
             onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+            className='cursor-pointer absolute top-6 rounded-lg right-2  m-2 bg-[#ffff00] p-2'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -398,7 +397,7 @@ export default function Page() {
           </div>
           <form onSubmit={categoryCreateHandel} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Title:</label>
+              <label className='block text-white font-bold mb-2'>Category Name:</label>
               <input
                 type='text'
                 name='title'

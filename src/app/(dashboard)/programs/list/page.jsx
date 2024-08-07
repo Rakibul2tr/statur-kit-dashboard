@@ -11,8 +11,7 @@ import { useDeleteProgramMutation, useProgramCreateMutation } from '@/redux/api/
 
 const theadData = [
   {
-    program_Id: 'Program Id',
-    title: 'title',
+    programs_title: 'title',
     description: 'Description',
     photo_url: 'photo_url',
     actions: 'actions'
@@ -249,7 +248,6 @@ export default function Page() {
                     {programs?.map(item => {
                       return (
                         <tr key={item.id}>
-                          <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
 
                           <td className='px-6 max-w-48 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis'>
@@ -318,17 +316,7 @@ export default function Page() {
             <div className='h-4/6 overflow-y-auto w-full p-4 bg-slate-900 shadow-md rounded-lg'>
               <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
                 <div className='mb-4'>
-                  <label className='block text-white font-bold mb-2'>Program Number :</label>
-                  <input
-                    type='number'
-                    name='id'
-                    defaultValue={formData?.id}
-                    onChange={handleChange}
-                    className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                  />
-                </div>
-                <div className='mb-4'>
-                  <label className='block text-white font-bold mb-2'>Content Title:</label>
+                  <label className='block text-white font-bold mb-2'>Program Title</label>
                   <input
                     type='text'
                     name='title'
@@ -338,7 +326,7 @@ export default function Page() {
                   />
                 </div>
                 <div className='mb-4'>
-                  <label className='block text-white font-bold mb-2'>Description:</label>
+                  <label className='block text-white font-bold mb-2'>Description</label>
                   <textarea
                     name='description'
                     defaultValue={formData?.description}
@@ -348,7 +336,7 @@ export default function Page() {
                 </div>
 
                 <div className='mb-4'>
-                  <label className='block text-white font-bold mb-2'>Photo URL:</label>
+                  <label className='block text-white font-bold mb-2'>Photo URL</label>
                   <input
                     type='text'
                     name='photo_url'

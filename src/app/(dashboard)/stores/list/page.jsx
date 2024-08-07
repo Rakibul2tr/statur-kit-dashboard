@@ -15,10 +15,8 @@ import Modal from '../../../components/Modal'
 
 const theadData = [
   {
-    product_Id: 'Product Id',
-    title: 'title',
-    category_id: 'category Id',
     category_title: 'category Title',
+    product_title: 'title',
     product_Image: 'image',
     discount: 'Discount Percent',
     action: 'Action'
@@ -249,14 +247,10 @@ export default function Page() {
 
                       return (
                         <tr key={item.id}>
-                          <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
-                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
-
-                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item?.category?.id}</td>
-
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
                             {item?.category?.title}
                           </td>
+                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
                           {item?.photo_url && (
                             <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
                               {item.photo_url ? (
@@ -304,7 +298,7 @@ export default function Page() {
         <Modal>
           <button
             onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+            className='cursor-pointer absolute top-6 rounded-lg right-2  m-2 bg-[#ffff00] p-2'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -328,7 +322,7 @@ export default function Page() {
           </div>
           <form onSubmit={updateHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
             <div className='mb-4'>
-              <label className='block text-white font-bold mb-2'>Product Category</label>
+              <label className='block text-white font-bold mb-2'>Product Category Name</label>
 
               <select
                 name='category'
@@ -338,7 +332,7 @@ export default function Page() {
               >
                 {productCategory.map(category => (
                   <option key={category.id} value={category.id}>
-                    Id {category.id} / Name {category.value}
+                    {category.id} / {category.value}
                   </option>
                 ))}
               </select>
@@ -398,7 +392,7 @@ export default function Page() {
         <Modal>
           <button
             onClick={() => closeModal()}
-            className='cursor-pointer absolute top-6 rounded-lg right-96  m-2 bg-[#ffff00] p-2'
+            className='cursor-pointer absolute top-6 rounded-lg right-2  m-2 bg-[#ffff00] p-2'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -432,7 +426,7 @@ export default function Page() {
               >
                 {productCategory.map(category => (
                   <option key={category.id} value={category.id}>
-                    Category Id {category.id} / Name {category.value}
+                    Category {category.id} / {category.value}
                   </option>
                 ))}
               </select>

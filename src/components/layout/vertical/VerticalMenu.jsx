@@ -99,8 +99,8 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
         {/* Diet menu */}
         <MenuSection>
           <SubMenu label={'Diet'} icon={<i className='tabler-grill-off' />}>
-            <MenuItem href={`/diet/list`}>Diet List</MenuItem>
             <MenuItem href={`/diet/dietCategory`}>Diet Category</MenuItem>
+            <MenuItem href={`/diet/list`}>Diet List</MenuItem>
           </SubMenu>
         </MenuSection>
         {/* Body Part menu */}
@@ -114,9 +114,8 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
         {/* product folder is Store */}
         <MenuSection>
           <SubMenu label={'Stores'} icon={<i className='tabler-shopping-cart' />}>
-            <MenuItem href={`/stores/list`}>Store List</MenuItem>
-
-            <MenuItem href={`/stores/categorylist`}>Store Category List</MenuItem>
+            <MenuItem href={`/stores/categorylist`}>Product Category List</MenuItem>
+            <MenuItem href={`/stores/list`}>Products List</MenuItem>
           </SubMenu>
         </MenuSection>
         {/* program item */}
