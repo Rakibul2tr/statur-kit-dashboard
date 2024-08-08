@@ -15,7 +15,6 @@ import Modal from '../../../components/Modal'
 
 const theadData = [
   {
-    diet_Id: 'Product Id',
     title: 'title',
     image: 'image',
     action: 'Action'
@@ -239,7 +238,6 @@ export default function Page() {
                     {allDietList?.map(item => {
                       return (
                         <tr key={item.id}>
-                          <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
 
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>

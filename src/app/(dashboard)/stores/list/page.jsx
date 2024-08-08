@@ -40,6 +40,7 @@ export default function Page() {
     title: selectedItem.title || '',
     description: selectedItem.description || '',
     photo_url: selectedItem.photo_url || '',
+    site_url: selectedItem.site_url || '',
     discount_percent: selectedItem.discount_percent || 0,
     is_active: true
   })
@@ -63,6 +64,7 @@ export default function Page() {
       description: selectedItem?.description || '',
       photo_url: selectedItem?.photo_url || '',
       discount_percent: selectedItem?.discount_percent || 0,
+      site_url: selectedItem?.site_url || '',
       is_active: true
     })
   }, [selectedItem])
@@ -462,6 +464,16 @@ export default function Page() {
               />
             </div>
 
+            <div className='mb-4'>
+              <label className='block text-white font-bold mb-2'>Product Link</label>
+              <input
+                type='text'
+                name='site_url'
+                defaultValue={formData?.site_url}
+                onChange={handleChange}
+                className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+              />
+            </div>
             <div className='mb-4'>
               <label className='block text-white font-bold mb-2'>discount Percentage:</label>
               <input

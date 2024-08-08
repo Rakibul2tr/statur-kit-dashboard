@@ -1,6 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
+import Image from 'next/image'
+
 import Swal from 'sweetalert2'
 
 import { useForm, useFieldArray } from 'react-hook-form'
@@ -18,11 +20,9 @@ import Modal from '../../../components/Modal'
 
 const theadData = [
   {
-    diet_Id: 'Product Id',
-    title: 'title',
-    category_id: 'category Id',
     category_title: 'category Title',
-    discount: 'Discount Percent',
+    Diet_plan_title: 'title',
+    image: 'image',
     action: 'Action'
   }
 ]
@@ -292,20 +292,23 @@ export default function Page() {
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-gray-200 overflow-x-auto'>
-                    {allDietList?.map(item => {
+                    {allDietList?.map((item, index) => {
+                      console.log('diet ', item)
+                      console.log('diet ', item?.data[index]?.data)
+
                       return (
                         <tr key={item.id}>
-                          <td className='px-6 py-4 text-sm font-medium text-slate-300 whitespace-nowrap'>{item.id}</td>
-                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
-
-                          <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>{item?.category?.id}</td>
-
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
                             {item?.category?.title}
                           </td>
+                          <td className='px-4 max-w-48 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis'>
+                            {item.description}
+                          </td>
 
                           <td className='px-6 py-4 text-sm text-slate-300 whitespace-nowrap'>
-                            {item?.discount_percent}
+                            {item.photo_url ? (
+                              <Image src={item.photo_url} alt='' width={50} height={40} className='rounded' />
+                            ) : null}
                           </td>
 
                           <td className=' text-sm font-medium text-right whitespace-nowrap'>

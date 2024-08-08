@@ -11,9 +11,9 @@ import { useDeleteProgramMutation, useProgramCreateMutation } from '@/redux/api/
 
 const theadData = [
   {
-    programs_title: 'title',
+    programs: 'title',
     description: 'Description',
-    photo_url: 'photo_url',
+    photo: 'photo_url',
     actions: 'actions'
   }
 ]
@@ -387,7 +387,7 @@ export default function Page() {
             <div className='h-4/6 overflow-y-auto w-full p-4 bg-slate-900 shadow-md rounded-lg'>
               <form onSubmit={createHandleSubmit} className='max-w-2xl mx-auto p-4 bg-slate-900 shadow-md rounded-lg'>
                 <div className='mb-4'>
-                  <label className='block text-white font-bold mb-2'>Program Title:</label>
+                  <label className='block text-white font-bold mb-2'>Program name:</label>
                   <input
                     type='text'
                     name='title'

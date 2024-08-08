@@ -43,6 +43,8 @@ export default function Page() {
   const [createProgramContent, { isSuccess: createSuccess, error: createError }] = useCreateProgramContentMutation()
   const [deleteProgramContent, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteProgramContentMutation()
 
+  // console.log('userData', userData)
+
   // user info from local storage data
   useEffect(() => {
     const localData = async () => {
@@ -154,7 +156,6 @@ export default function Page() {
 
   useEffect(() => {
     if (deleteSuccess) {
-      alert('')
       Swal.fire({
         title: 'Good job!',
         text: 'Program content is deleted!',
@@ -469,7 +470,7 @@ export default function Page() {
                   </div>
 
                   <div className='mb-4'>
-                    <label className='block text-white font-bold mb-2'>Program content Title:</label>
+                    <label className='block text-white font-bold mb-2'>Program content name:</label>
                     <input
                       type='text'
                       {...register('title')}
@@ -483,6 +484,17 @@ export default function Page() {
                       {...register('description')}
                       className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block text-white text-sm font-bold mb-2'>Select level type</label>
+                    <select
+                      {...register('level')}
+                      className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
+                    >
+                      <option value='beginner'>Beginner</option>
+                      <option value='intermediate'>Intermediate</option>
+                      <option value='expert'>Expert</option>
+                    </select>
                   </div>
 
                   <div className='mb-4'>

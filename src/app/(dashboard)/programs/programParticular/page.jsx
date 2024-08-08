@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, Controller } from 'react-hook-form'
 
 import Swal from 'sweetalert2'
 
@@ -19,6 +19,7 @@ import {
   useDeleteProgramParticularMutation
 } from '@/redux/api/apiSlice'
 import DynamicForm from '../../../components/FormTest'
+import CustomEditor from '@/app/components/CustomEditor'
 
 const theadData = [
   {
@@ -34,7 +35,30 @@ export default function Page() {
   const [userData, setUserData] = useState({})
   const [updateModal, setUpdateModal] = useState(false)
   const [createProgConteModal, setCreateProgConteModal] = useState(false)
-  const [selectedItem, setSelectedItem] = useState({})
+  const [selectedItem, setSelectedItem] = useState('html')
+
+  const [selectType, setSelectType] = useState({
+    html: '',
+    image: '',
+    video: '',
+    pdf: ''
+  })
+
+  // const [selectedOptions, setSelectedOptions] = useState({
+  //   html: false,
+  //   video: false,
+  //   image: false,
+  //   pdf: false
+  // })
+
+  // const handleSelect = event => {
+  //   const value = event.target.value
+
+  //   setSelectedOptions(prevState => ({
+  //     ...prevState,
+  //     [value]: !prevState[value]
+  //   }))
+  // }
 
   const { data: programsContent } = useProgramContentQuery({ token: userData?.token ? userData.token : null })
 
@@ -81,6 +105,7 @@ export default function Page() {
     setUpdateModal(false)
     setCreateProgConteModal(false)
     setSelectedItem({})
+    setSelectType('')
   }
 
   // create program particular content data handel=====================
@@ -91,13 +116,13 @@ export default function Page() {
       title: selectedItem?.title || '',
       description: selectedItem?.description || '',
       data: selectedItem?.data || [{ key: '', data: '', type: '' }],
-      features: selectedItem?.features || [{ key: '', data: '', type: 'video' }],
+      features: selectedItem?.features || [{ key: '', data: '', type: '' }],
       is_active: selectedItem?.is_active || false,
       order: 1
     }
   })
 
-  console.log('selectedItem', selectedItem)
+  // console.log('selectedItem', selectedItem)
 
   const {
     fields: dataFields,
@@ -108,6 +133,12 @@ export default function Page() {
     name: 'data'
   })
 
+  let dataFieldsWatch = watch('data')
+
+  console.log('data field watch', dataFieldsWatch)
+
+  // console.log('data fields', dataFields)
+
   const {
     fields: featureFields,
     append: appendFeature,
@@ -116,6 +147,8 @@ export default function Page() {
     control,
     name: 'features'
   })
+
+  let featureFieldsWatch = watch('features')
 
   useEffect(() => {
     if (selectedItem) {
@@ -131,7 +164,11 @@ export default function Page() {
 
   const createOnSubmit = data => {
     data.content = parseInt(data.content)
-    createProgramParticular({ data, token: userData.token })
+    data.features = ['test']
+
+    console.log('new data', data)
+
+    createProgramParticular({ data: data, token: userData.token })
   }
 
   useEffect(() => {
@@ -192,7 +229,7 @@ export default function Page() {
     if (deleteSuccess) {
       Swal.fire({
         title: 'Good job!',
-        text: 'Program is deleted!',
+        text: 'Content is deleted!',
         icon: 'success'
       })
       refetch()
@@ -627,9 +664,9 @@ export default function Page() {
                     />
                   </div>
                   <fieldset className='mb-4'>
-                    <legend className='text-lg font-bold text-white'>Data</legend>
-                    {dataFields.map((item, index) => (
-                      <div key={item.id} className='mb-4'>
+                    <legend className='text-md font-bold text-white'>Content add field</legend>
+                    {dataFieldsWatch?.map((item, index) => (
+                      <div key={index} className='mb-4'>
                         <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-type-${index}`}>
                           Select field type
                         </label>
@@ -637,41 +674,70 @@ export default function Page() {
                           {...register(`data.${index}.type`)}
                           className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
                           id={`data-type-${index}`}
-                          defaultValue={item.type}
+                          defaultValue={item?.type}
                         >
-                          <option value='text'>Text</option>
+                          <option value='html'>Text</option>
                           <option value='image'>Image</option>
                           <option value='video'>Video</option>
                           <option value='pdf'>pdf</option>
                         </select>
-                        <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-key-${index}`}>
-                          select name
-                        </label>
-                        <select
-                          {...register(`data.${index}.key`)}
-                          className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
-                          id={`data-type-${index}`}
-                          defaultValue={item.key}
-                        >
-                          <option value='title'>Title</option>
-                          <option value='sub_title'>Sub Title</option>
-                          <option value='description'>Description</option>
-                          <option value='list_text'>List Text</option>
-                          <option value='image'>image</option>
-                          <option value='video'>video</option>
-                          <option value='pdf'>pdf</option>
-                        </select>
 
-                        <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
-                          Value
-                        </label>
-                        <input
-                          {...register(`data.${index}.data`)}
-                          className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
-                          id={`data-data-${index}`}
-                          type='text'
-                          defaultValue={item.data}
-                        />
+                        {item.type == 'html' ? (
+                          <>
+                            <Controller
+                              name={`data.${index}.data`}
+                              control={control}
+                              defaultValue={item?.data}
+                              render={({ field }) => (
+                                <CustomEditor value={field.value} onBlur={newContent => field.onChange(newContent)} />
+                              )}
+                            />
+                          </>
+                        ) : null}
+
+                        {item.type == 'image' && (
+                          <>
+                            <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
+                              Select image
+                            </label>
+
+                            <input
+                              {...register(`data.${index}.data`)}
+                              className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                              id={`data-data-${index}`}
+                              type='file'
+                              accept='image/*'
+                            />
+                          </>
+                        )}
+                        {item.type == 'video' && (
+                          <>
+                            <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
+                              Video link
+                            </label>
+                            <input
+                              {...register(`data.${index}.data`)}
+                              className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                              id={`data-data-${index}`}
+                              type='text'
+                              defaultValue={item?.data}
+                            />
+                          </>
+                        )}
+                        {item.type == 'pdf' && (
+                          <>
+                            <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
+                              Pdf file link
+                            </label>
+                            <input
+                              {...register(`data.${index}.data`)}
+                              className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                              id={`data-data-${index}`}
+                              type='text'
+                              defaultValue={item?.data}
+                            />
+                          </>
+                        )}
 
                         <button
                           type='button'
@@ -687,14 +753,14 @@ export default function Page() {
                       className='bg-[#fff000] hover:bg-[#ffff222] text-slate-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
                       onClick={() => appendData({ key: '', data: '', type: '' })}
                     >
-                      Add Data
+                      Add new data
                     </button>
                   </fieldset>
-
-                  <fieldset className='mb-4'>
-                    <legend className='text-lg font-bold text-white'>Features</legend>
-                    {featureFields.map((item, index) => (
-                      <div key={item.id} className='mb-4'>
+                  {/* features fieldset */}
+                  {/* <fieldset className='mb-4'>
+                    <legend className='text-md font-bold text-white'>Sequence video add field</legend>
+                    {featureFieldsWatch?.map((item, index) => (
+                      <div key={index} className='mb-4'>
                         <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-type-${index}`}>
                           Select field type
                         </label>
@@ -702,23 +768,32 @@ export default function Page() {
                           {...register(`features.${index}.type`)}
                           className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
                           id={`features-type-${index}`}
-                          defaultValue={item.type}
+                          defaultValue={item?.type}
                         >
                           <option value='rest'>Rest time</option>
                           <option value='video'>Video</option>
                         </select>
 
-                        <label className='block text-white text-sm font-bold mb-2' htmlFor={`features-data-${index}`}>
-                          Video Title
-                        </label>
-                        <input
-                          {...register(`features.${index}.key`)}
-                          className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
-                          id={`features-data-${index}`}
-                          type='text'
-                          defaultValue={item.data}
-                        />
-                        {featureFields[index]?.type == 'video' ? (
+                        {
+                          (item.type = 'rest' && (
+                            <>
+                              <label
+                                className='block text-white text-sm font-bold mb-2'
+                                htmlFor={`features-data-${index}`}
+                              >
+                                Video Title
+                              </label>
+                              <input
+                                {...register(`features.${index}.data`)}
+                                className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                                id={`features-data-${index}`}
+                                type='text'
+                                defaultValue={item?.data}
+                              />
+                            </>
+                          ))
+                        }
+                        {item.type == 'video' && (
                           <>
                             <label
                               className='block text-white text-sm font-bold mb-2'
@@ -732,10 +807,10 @@ export default function Page() {
                               className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
                               id={`features-data-${index}`}
                               type='text'
-                              defaultValue={item.data}
+                              defaultValue={item?.data}
                             />
                           </>
-                        ) : null}
+                        )}
 
                         <button
                           type='button'
@@ -749,12 +824,11 @@ export default function Page() {
                     <button
                       type='button'
                       className='bg-[#fff000] hover:bg-[#ffff222] text-slate-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-                      onClick={() => appendFeature({ key: '', data: '', type: 'video' })}
+                      onClick={() => appendFeature({ key: '', data: '', type: '' })}
                     >
-                      Add Feature
+                      Add video
                     </button>
-                  </fieldset>
-                  {/* <CodeEditor setValue={setValue} /> */}
+                  </fieldset> */}
 
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Active:</label>
