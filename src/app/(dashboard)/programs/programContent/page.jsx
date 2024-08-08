@@ -22,8 +22,8 @@ const theadData = [
     program_name: 'Program name',
     program_image: 'Program image',
     content_title: 'title',
-    description: 'Description',
-    photo_url: 'photo_url',
+    level: 'level',
+    photos: 'photo_url',
     actions: 'actions'
   }
 ]
@@ -83,6 +83,7 @@ export default function Page() {
       title: selectedItem?.title || '',
       description: selectedItem?.description || '',
       photo_url: selectedItem?.photo_url || '',
+      level: selectedItem?.level || '',
       is_active: selectedItem?.is_active || false
     }
   })
@@ -94,6 +95,7 @@ export default function Page() {
       setValue('title', selectedItem?.title)
       setValue('description', selectedItem?.description)
       setValue('photo_url', selectedItem?.photo_url)
+      setValue('level', selectedItem?.level)
       setValue('is_active', selectedItem?.is_active)
     }
   }, [selectedItem, setValue])
@@ -246,7 +248,7 @@ export default function Page() {
                             <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>{item.title}</td>
 
                             <td className='px-4 max-w-48 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis'>
-                              {item?.description}
+                              {item?.level}
                             </td>
 
                             <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>
@@ -340,7 +342,18 @@ export default function Page() {
                       className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
                   </div>
-
+                  <div className='mb-4'>
+                    <label className='block text-white text-sm font-bold mb-2'>Select level type</label>
+                    <select
+                      defaultValue={selectedItem?.level}
+                      {...register('level')}
+                      className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
+                    >
+                      <option value='beginner'>Beginner</option>
+                      <option value='intermediate'>Intermediate</option>
+                      <option value='expert'>Expert</option>
+                    </select>
+                  </div>
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Photo URL:</label>
                     <input

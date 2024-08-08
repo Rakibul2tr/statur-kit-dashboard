@@ -4,20 +4,8 @@ import React, { useState, useRef, useMemo } from 'react'
 
 import JoditEditor from 'jodit-react'
 
-function CustomEditor({ value, onBlur, setSelectType }) {
+function CustomEditor({ value, onBlur }) {
   const editor = useRef(null)
-
-  // const [content, setContent] = useState()
-
-  // const handleChange = newContent => {
-  //   setContent(newContent)
-  // }
-
-  // const seveData = () => {
-  //   setValue('html', content)
-  // }
-
-  // setSelectType={setSelectType}
 
   return (
     <div className='my-3'>
@@ -28,9 +16,6 @@ function CustomEditor({ value, onBlur, setSelectType }) {
         onBlur={onBlur}
         config={config}
       />
-      {/* <button onClick={() => setSelectedOptions(false)} className='py-2 mt-1 px-4 bg-[#fff000] text-black rounded-md'>
-        Save
-      </button> */}
     </div>
   )
 }

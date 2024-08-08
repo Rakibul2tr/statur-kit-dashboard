@@ -1,6 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
+import dynamic from 'next/dynamic'
+
 import Image from 'next/image'
 
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
@@ -9,8 +11,6 @@ import Swal from 'sweetalert2'
 
 import Modal from '../../../components/Modal'
 
-import CodeEditor from '../../../components/CodeEditor'
-
 import {
   useProgramContentQuery,
   useProgramParticularQuery,
@@ -18,8 +18,10 @@ import {
   useCreateProgramParticularMutation,
   useDeleteProgramParticularMutation
 } from '@/redux/api/apiSlice'
-import DynamicForm from '../../../components/FormTest'
-import CustomEditor from '@/app/components/CustomEditor'
+
+const CustomEditor = dynamic(() => import('@/app/components/CustomEditor'), {
+  ssr: false
+})
 
 const theadData = [
   {
@@ -524,7 +526,6 @@ export default function Page() {
                       Add Feature
                     </button>
                   </fieldset>
-                  {/* <CodeEditor setValue={setValue} /> */}
 
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Active:</label>
@@ -541,63 +542,6 @@ export default function Page() {
                   >
                     update Content
                   </button>
-                  {/* <div className='mb-4'>
-                    <label className='block text-white font-bold mb-2'>Content Name:</label>
-                    <select
-                      {...register('content')}
-                      // onChange={handleContentChange}
-
-                      className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                    >
-                      {programsContent?.map((i, index) => (
-                        <option value={i.id} key={index}>
-                          Content No: - {i.id} / Content Name - {i.title}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className='mb-4'>
-                    <label className='block text-white font-bold mb-2'>Program Title:</label>
-                    <input
-                      type='text'
-                      {...register('title')}
-                      defaultValue={selectedItem?.title}
-                      // onChange={handleChange}
-                      className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                    />
-                  </div>
-                  <div className='mb-4'>
-                    <label className='block text-white font-bold mb-2'>Description:</label>
-                    <textarea
-                      {...register('description')}
-                      defaultValue={selectedItem?.description}
-                      // onChange={handleChange}
-                      className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
-                    />
-                  </div>
-                  {/* <CodeEditor setValue={setValue} selectedItem={selectedItem} />
-
-                  <div className='mb-4'>
-                    <label className='block text-white font-bold mb-2'>Active:</label>
-                    <div className='flex items-center'>
-                      <input
-                        type='checkbox'
-                        {...register('is_active')}
-                        defaultValue={selectedItem?.is_active}
-                        className='toggle-checkbox '
-                        id='is_active'
-                      />
-                      <label htmlFor='is_active' className='ml-2 text-white'>
-                        {watch('is_active') ? 'Active' : 'Inactive'}
-                      </label>
-                    </div>
-                  </div>
-                  <button
-                    type='submit'
-                    className='w-full px-4 cursor-pointer py-2 bg-[#ffff00] text-black font-bold rounded-lg shadow-md hover:bg-yellow-300 focus:outline-none'
-                  >
-                    Update
-                  </button> */}
                 </form>
               </div>
             </div>

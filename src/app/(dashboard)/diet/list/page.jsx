@@ -1,13 +1,16 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 
 import Swal from 'sweetalert2'
 
 import { useForm, useFieldArray } from 'react-hook-form'
 
-import CustomEditor from '../../../components/CustomEditor'
+const CustomEditor = dynamic(() => import('@/app/components/CustomEditor'), {
+  ssr: false
+})
 
 import {
   useAllDietCategoryQuery,
@@ -522,7 +525,6 @@ export default function Page() {
 
                   {/* <CustomEditor setValue={setValue} /> */}
 
-                  {/* {chengInput == 'text' && <CodeEditor setValue={setValue} />} */}
                   <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-key-${index}`}>
                     select name
                   </label>
