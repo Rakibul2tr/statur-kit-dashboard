@@ -117,8 +117,9 @@ export default function Page() {
       content: selectedItem?.content || '',
       title: selectedItem?.title || '',
       description: selectedItem?.description || '',
+      description: selectedItem?.order || 0,
       data: selectedItem?.data || [{ key: '', data: '', type: '' }],
-      features: selectedItem?.features || [{ key: '', data: '', type: '' }],
+      features: selectedItem?.features || [],
       is_active: selectedItem?.is_active || false,
       order: 1
     }
@@ -157,6 +158,7 @@ export default function Page() {
       setValue('content', selectedItem.content)
       setValue('title', selectedItem.title)
       setValue('description', selectedItem.description)
+      setValue('order', selectedItem.order)
       setValue('data', selectedItem.data)
       setValue('features', selectedItem.features)
       setValue('is_active', selectedItem.is_active)
@@ -166,7 +168,8 @@ export default function Page() {
 
   const createOnSubmit = data => {
     data.content = parseInt(data.content)
-    data.features = ['test']
+
+    // data.features = ['test']
 
     console.log('new data', data)
 
@@ -193,15 +196,18 @@ export default function Page() {
 
   //  update program particular content data handel===============
 
-  const id = selectedItem.id
+  const id = selectedItem?.content?.id
   const token = userData.token
+
+  console.log('selectedItem', selectedItem, id)
 
   const updateHandleSubmit = data => {
     data.content = parseInt(data.content)
+    data.order = parseInt(data.order)
 
-    // console.log('particular update data', a, typeof selectedItem.id, data, userData.token)
+    console.log('particular update data', id, data, token)
 
-    updateProgramParticular({ id, token, data })
+    updateProgramParticular({ id: selectedItem?.content?.id, token: userData.token, data })
   }
 
   useEffect(() => {
@@ -374,14 +380,17 @@ export default function Page() {
                     <label className='block text-white font-bold mb-2'>Content Name:</label>
                     <select
                       {...register('content')}
-                      defaultValue={selectedItem?.content?.title}
+                      // defaultValue={selectedItem?.content?.title}
                       className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     >
-                      {programsContent?.map((i, index) => (
+                      <option value={selectedItem?.content?.id} selected={selectedItem?.content?.title}>
+                        {selectedItem?.content?.title}
+                      </option>
+                      {/* {programsContent?.map((i, index) => (
                         <option value={i.id} key={index}>
-                          Content No: - {i.id} / Content Name - {i.title}
+                          {i.title}
                         </option>
-                      ))}
+                      ))} */}
                     </select>
                   </div>
 
@@ -401,7 +410,189 @@ export default function Page() {
                       className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
                   </div>
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Serial</label>
+                    <input
+                      type='number'
+                      {...register('order')}
+                      className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
                   <fieldset className='mb-4'>
+                    <legend className='text-md font-bold text-white'>Content add field</legend>
+                    {dataFieldsWatch?.map((item, index) => (
+                      <div key={index} className='mb-4'>
+                        <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-type-${index}`}>
+                          Select field type
+                        </label>
+                        <select
+                          {...register(`data.${index}.type`)}
+                          className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
+                          id={`data-type-${index}`}
+                          defaultValue={item?.type}
+                        >
+                          <option value='html'>Text</option>
+                          <option value='image'>Image</option>
+                          <option value='video'>Video</option>
+                          <option value='pdf'>pdf</option>
+                        </select>
+
+                        {item.type == 'html' ? (
+                          <>
+                            <Controller
+                              name={`data.${index}.data`}
+                              control={control}
+                              defaultValue={item?.data}
+                              render={({ field }) => (
+                                <CustomEditor value={field.value} onBlur={newContent => field.onChange(newContent)} />
+                              )}
+                            />
+                          </>
+                        ) : null}
+
+                        {item.type == 'image' && (
+                          <>
+                            <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
+                              Select image
+                            </label>
+                            <input
+                              {...register(`data.${index}.data`)}
+                              className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                              id={`data-data-${index}`}
+                              type='text'
+                            />
+
+                            {/* <input
+                              {...register(`data.${index}.data`)}
+                              className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                              id={`data-data-${index}`}
+                              type='file'
+                              accept='image/*'
+                            /> */}
+                          </>
+                        )}
+                        {item.type == 'video' && (
+                          <>
+                            <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
+                              Video link
+                            </label>
+                            <input
+                              {...register(`data.${index}.data`)}
+                              className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                              id={`data-data-${index}`}
+                              type='text'
+                              defaultValue={item?.data}
+                            />
+                          </>
+                        )}
+                        {item.type == 'pdf' && (
+                          <>
+                            <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
+                              Pdf file link
+                            </label>
+                            <input
+                              {...register(`data.${index}.data`)}
+                              className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                              id={`data-data-${index}`}
+                              type='text'
+                              defaultValue={item?.data}
+                            />
+                          </>
+                        )}
+
+                        <button
+                          type='button'
+                          className='bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2'
+                          onClick={() => removeData(index)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type='button'
+                      className='bg-[#fff000] hover:bg-[#ffff222] text-slate-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+                      onClick={() => appendData({ key: '', data: '', type: '' })}
+                    >
+                      Add new data
+                    </button>
+                  </fieldset>
+                  {/* features fieldset */}
+
+                  <fieldset className='mb-4'>
+                    <legend className='text-md font-bold text-white'>Sequence video field</legend>
+                    {featureFields?.map((item, index) => (
+                      <div key={index} className='mb-4'>
+                        <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-type-${index}`}>
+                          Select type
+                        </label>
+                        <select
+                          {...register(`features.${index}.type`)}
+                          className='shadow bg-slate-700 appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline'
+                          id={`features-type-${index}`}
+                          defaultValue={item?.type}
+                        >
+                          <option value='rest'>Rest time</option>
+                          <option value='video'>Video</option>
+                        </select>
+
+                        {
+                          (item.type = 'rest' && (
+                            <>
+                              <label
+                                className='block text-white text-sm font-bold mb-2'
+                                htmlFor={`features-data-${index}`}
+                              >
+                                Video Title
+                              </label>
+                              <input
+                                {...register(`features.${index}.data`)}
+                                className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                                id={`features-data-${index}`}
+                                type='text'
+                                defaultValue={item?.data}
+                              />
+                            </>
+                          ))
+                        }
+                        {item.type == 'video' && (
+                          <>
+                            <label
+                              className='block text-white text-sm font-bold mb-2'
+                              htmlFor={`features-data-${index}`}
+                            >
+                              Video link
+                            </label>
+
+                            <input
+                              {...register(`features.${index}.data`)}
+                              className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                              id={`features-data-${index}`}
+                              type='text'
+                              defaultValue={item?.data}
+                            />
+                          </>
+                        )}
+
+                        <button
+                          type='button'
+                          className='bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2'
+                          onClick={() => removeFeature(index)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type='button'
+                      className='bg-[#fff000] hover:bg-[#ffff222] text-slate-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+                      onClick={() => appendFeature({ key: '', data: '', type: '' })}
+                    >
+                      Add video
+                    </button>
+                  </fieldset>
+
+                  {/* <fieldset className='mb-4'>
                     <legend className='text-lg font-bold text-white'>Data</legend>
                     {dataFields.map((item, index) => (
                       <div key={item.id} className='mb-4'>
@@ -525,7 +716,7 @@ export default function Page() {
                     >
                       Add Feature
                     </button>
-                  </fieldset>
+                  </fieldset> */}
 
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Active:</label>
@@ -575,7 +766,6 @@ export default function Page() {
                 <h2 className='text-slate-800 text-center'>Create a Particular Content</h2>
               </div>
               <div className='h-4/6 overflow-y-auto p-4 bg-slate-900 shadow-md rounded-lg'>
-                {/* <DynamicForm /> */}
                 <form onSubmit={handleSubmit(createOnSubmit)}>
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Content Name:</label>
@@ -585,7 +775,7 @@ export default function Page() {
                     >
                       {programsContent?.map((i, index) => (
                         <option value={i.id} key={index}>
-                          Content No: - {i.id} / Content Name - {i.title}
+                          {i.title}
                         </option>
                       ))}
                     </select>
@@ -597,6 +787,15 @@ export default function Page() {
                       type='text'
                       {...register('title')}
                       className='w-full px-3 py-2 bg-slate-700 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Serial</label>
+                    <input
+                      type='number'
+                      {...register('order')}
+                      className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
                   </div>
 
@@ -644,14 +843,20 @@ export default function Page() {
                             <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-data-${index}`}>
                               Select image
                             </label>
-
                             <input
+                              {...register(`data.${index}.data`)}
+                              className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+                              id={`data-data-${index}`}
+                              type='text'
+                            />
+
+                            {/* <input
                               {...register(`data.${index}.data`)}
                               className='shadow bg-slate-700 text-white appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
                               id={`data-data-${index}`}
                               type='file'
                               accept='image/*'
-                            />
+                            /> */}
                           </>
                         )}
                         {item.type == 'video' && (
@@ -701,12 +906,13 @@ export default function Page() {
                     </button>
                   </fieldset>
                   {/* features fieldset */}
-                  {/* <fieldset className='mb-4'>
-                    <legend className='text-md font-bold text-white'>Sequence video add field</legend>
-                    {featureFieldsWatch?.map((item, index) => (
+
+                  <fieldset className='mb-4'>
+                    <legend className='text-md font-bold text-white'>Sequence video field</legend>
+                    {featureFields?.map((item, index) => (
                       <div key={index} className='mb-4'>
                         <label className='block text-white text-sm font-bold mb-2' htmlFor={`data-type-${index}`}>
-                          Select field type
+                          Select type
                         </label>
                         <select
                           {...register(`features.${index}.type`)}
@@ -772,7 +978,7 @@ export default function Page() {
                     >
                       Add video
                     </button>
-                  </fieldset> */}
+                  </fieldset>
 
                   <div className='mb-4'>
                     <label className='block text-white font-bold mb-2'>Active:</label>

@@ -70,7 +70,6 @@ const VerticalMenu = ({ scrollMenu, dictionary }) => {
         <MenuSection>
           <SubMenu label={'User'} icon={<i className='tabler-user' />}>
             <MenuItem href={`/user/list`}>User list</MenuItem>
-            <MenuItem href={`/user/view`}>Preview</MenuItem>
           </SubMenu>
         </MenuSection>
         {/* equipment menu */}

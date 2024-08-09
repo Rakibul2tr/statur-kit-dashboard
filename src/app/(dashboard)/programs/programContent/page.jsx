@@ -20,9 +20,10 @@ import {
 const theadData = [
   {
     program_name: 'Program name',
-    program_image: 'Program image',
+    Program_banner: 'Program image',
     content_title: 'title',
     level: 'level',
+    order: 'order',
     photos: 'photo_url',
     actions: 'actions'
   }
@@ -84,6 +85,7 @@ export default function Page() {
       description: selectedItem?.description || '',
       photo_url: selectedItem?.photo_url || '',
       level: selectedItem?.level || '',
+      order: selectedItem?.order || 1,
       is_active: selectedItem?.is_active || false
     }
   })
@@ -96,6 +98,7 @@ export default function Page() {
       setValue('description', selectedItem?.description)
       setValue('photo_url', selectedItem?.photo_url)
       setValue('level', selectedItem?.level)
+      setValue('order', selectedItem?.order)
       setValue('is_active', selectedItem?.is_active)
     }
   }, [selectedItem, setValue])
@@ -222,7 +225,7 @@ export default function Page() {
                           <th
                             key={val}
                             scope='col'
-                            className='bg-slate-800 px-1 py-3 text-xs font-bold text-center text-gray-600 uppercase '
+                            className='bg-slate-800 px-1 py-3 text-xs font-bold text-start text-gray-600 uppercase '
                           >
                             {val}
                           </th>
@@ -249,6 +252,9 @@ export default function Page() {
 
                             <td className='px-4 max-w-48 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis'>
                               {item?.level}
+                            </td>
+                            <td className='px-4 max-w-48 py-4 text-sm text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis'>
+                              {item?.order}
                             </td>
 
                             <td className='px-4 py-4 text-sm text-slate-300 whitespace-nowrap'>
@@ -360,6 +366,15 @@ export default function Page() {
                       type='text'
                       {...register('photo_url')}
                       defaultValue={selectedItem?.photo_url}
+                      className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Serial</label>
+                    <input
+                      type='number'
+                      {...register('order')}
+                      defaultValue={selectedItem?.order}
                       className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
                   </div>
@@ -515,6 +530,14 @@ export default function Page() {
                     <input
                       type='text'
                       {...register('photo_url')}
+                      className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
+                    />
+                  </div>
+                  <div className='mb-4'>
+                    <label className='block text-white font-bold mb-2'>Serial</label>
+                    <input
+                      type='number'
+                      {...register('order')}
                       className='w-full px-3 bg-slate-700 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-white text-white'
                     />
                   </div>
